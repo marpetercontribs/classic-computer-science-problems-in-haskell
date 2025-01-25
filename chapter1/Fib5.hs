@@ -22,11 +22,11 @@
 module Main where
 
 fib5 :: Integer -> Integer
-fib5 n = firstElement (fibonacciLoop (0, 1, n))
+fib5 n = loop n (0, 1)
     where
-        firstElement (x,_,_) = x
-        fibonacciLoop (last,next,0) = (last, next, 0)
-        fibonacciLoop (last,next,counter) = fibonacciLoop(next, last+next, counter-1 )
+        loop n (last, next)
+            | n==0      = last
+            | otherwise = loop (n-1) (next, last+next)
 
 main :: IO ()
 main = do
