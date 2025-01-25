@@ -13,7 +13,7 @@ Code meant for reuse such as `generic_search` of chapter 2 and `csp` of chapter 
 Done:
 
 - Chapter 1:
-  - Fibonacci series, examples Fib1, Fib2
+  - Fibonacci series, examples Fib1, Fib2, Fib5
 
 In progress:
 
