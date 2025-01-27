@@ -1,4 +1,4 @@
--- Fib5.hs
+-- Fib4.hs
 -- Adapted From Classic Computer Science Problems in Python/Java Chapter 1
 -- Copyright 2025 Markus Peter
 --
@@ -13,22 +13,16 @@
 -- WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 -- See the License for the specific language governing permissions and
 -- limitations under the License.
---
--- You wouldn't use a classical "for" loop in Haskell. But something getting
--- close is using a recursion with a counter, which also allows making the
--- recursive algorithm (e.g. of Fib2) tail-recursive, thus faster and much 
--- less memory consuming
 
-module Main where
+import Data.Function.Memoize
 
-fib5 :: Integer -> Integer
-fib5 n = loop n (0, 1)
-    where
-        loop n (last, next)
-            | n==0      = last
-            | otherwise = loop (n-1) (next, last+next)
+fib4 :: Integer -> Integer
+fib4 = memoize plainFib where
+    plainFib n
+        | n < 2 = n
+        | otherwise = fib4 (n-2) + fib4 (n-1)
 
 main :: IO ()
 main = do
-    putStrLn ("The    5th Fibonacci number is: " ++ show (fib5 5))
-    putStrLn ("The 1000th Fibonacci number is: " ++ show (fib5 1000))
+    putStrLn ("The    5th Fibonacci number is: " ++ show (fib4 5))
+    putStrLn ("The 1000th Fibonacci number is: " ++ show (fib4 1000))
