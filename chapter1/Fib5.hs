@@ -15,6 +15,13 @@
    limitations under the License.
 -}
 
+{- 
+   You wouldn't use a classical "for" loop in Haskell. But something getting
+   close is using a recursion with a counter, which also allows making the
+   recursive algorithm (e.g. of Fib2) tail-recursive, thus faster and much 
+   less memory consuming
+-}
+
 module Main where
 
 fib5 :: Integer -> Integer

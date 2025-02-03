@@ -13,16 +13,13 @@
    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
    See the License for the specific language governing permissions and
    limitations under the License.
-
-   You wouldn't use a classical "for" loop in Haskell. But something getting
-   close is using a recursion with a counter, which also allows making the
-   recursive algorithm (e.g. of Fib2) tail-recursive, thus faster and much 
-   less memory consuming
 -}
 
--- An infinite list in Haskell is close to a "generator", although it "remembers"
--- all its elements. Nevertheless, you could use it in a list comprehension similar
--- to how you would use a stream in Java or a generator in Python.
+{-
+   An infinite list in Haskell is close to a "generator", although it "remembers"
+   all its elements. Nevertheless, you could use it in a list comprehension similar
+   to how you would use a stream in Java or a generator in Python.
+-}
 
 fib6 = fibGenerator 1 1 where
     fibGenerator last next = last:(fibGenerator next (last+next))
