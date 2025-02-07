@@ -2,7 +2,7 @@ cabal-version:      2.0
 name:               chapter1
 version:            0.1.0.0
 synopsis:           Port of chapter 1 of 'Classic Computer Science Problems' to Haskell
-description:        An attempt at porting the source code of the books Classic Computer Science Problems in Python and Classic Computer Science Problems in Java by David Kopec to Hasell
+description:        An attempt at porting the source code of the books Classic Computer Science Problems in Python and Classic Computer Science Problems in Java by David Kopec to Haskell
 homepage:           https://github.com/marpetercontribs/classic-computer-science-problems-in-haskell
 
 license:            Apache-2.0
@@ -63,5 +63,12 @@ executable trivialCompression
     build-depends:    base ^>=4.17.2.1,
                       -- needed by main to calculate the size of the data structures:
                       deepseq ^>= 1.4.8.0, ghc-datasize ^>= 0.2.7
+    hs-source-dirs:   .
+    default-language: Haskell2010
+
+executable unbreakableEncryption
+    main-is:          UnbreakableEncryption.hs
+    -- other-extensions:
+    build-depends:    base ^>=4.17.2.1, random ^>=1.2.0
     hs-source-dirs:   .
     default-language: Haskell2010

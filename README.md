@@ -19,11 +19,11 @@ Done:
 - Chapter 1:
   - Fibonacci series, examples Fib1, Fib2, Fib3, Fib4, Fib5, Fib6
   - Trivial (gene) compression
+  - Unbreakable encryption
 
 In progress:
 
 - Chapter 1:
-  - unbreakable encryption
-  - calculating Pi
-  - the towers of Hanoi
+  - Calculating Pi
+  - The towers of Hanoi
 
