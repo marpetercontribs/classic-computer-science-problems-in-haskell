@@ -28,8 +28,14 @@ randomKey length = take length (randoms (mkStdGen 12345)) -- 12345 is the seed
 encrypt :: String -> ([Word8], [Word8])
 encrypt string = (encrypted, key) where
    key = randomKey (length string)
-   originalBytes = map (fromIntegral . ord) string
-   encrypted = [ xor k w | (k,w)  <- (zip key originalBytes) ]
+   encrypted = zipWith xor key (map (fromIntegral . ord) string)
+-- or a bit more explicit:
+{- encrypt string = (encrypted, key) where
+    key = randomKey (length string)
+    -- convert the string into a list of bytes
+    originalBytes = map (fromIntegral . ord) string
+    -- create a list by xoring each byte of the key with the corresponding byte of the original message
+    encrypted = zipWith xor key originalBytes -}
 
 decrypt :: [Word8] -> [Word8] -> String
 decrypt key1 key2 = map (chr . fromIntegral) (zipWith xor key1 key2)
