@@ -15,6 +15,7 @@
    limitations under the License.
 -}
 
+-- The following two imports are needed to calculate the size of the data structures
 import Control.DeepSeq
 import GHC.DataSize (recursiveSize)
 
