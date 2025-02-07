@@ -21,6 +21,8 @@
    to how you would use a stream in Java or a generator in Python.
 -}
 
+module Main where
+   
 fib6 = fibGenerator 1 1 where
     fibGenerator last next = last:(fibGenerator next (last+next))
 

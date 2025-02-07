@@ -15,6 +15,8 @@
    limitations under the License.
 -}
 
+module Main where
+    
 import Data.Function.Memoize
 
 fib4 :: Integer -> Integer

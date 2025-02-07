@@ -32,6 +32,8 @@
   See e.g. https://kseo.github.io/posts/2017-01-14-memoization-in-hasekll.html
 -}
 
+module Main where
+
 import Data.List -- to be able to use genericIndex instead of the "standard"
                  -- list index operator !! below, because !! requires type Int
 
