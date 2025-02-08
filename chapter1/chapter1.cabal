@@ -72,3 +72,12 @@ executable unbreakableEncryption
     build-depends:    base ^>=4.17.2.1, random ^>=1.2.0
     hs-source-dirs:   .
     default-language: Haskell2010
+
+executable calculatePi
+    main-is:          CalculatePi.hs
+    -- other-extensions:
+    build-depends:    base ^>=4.17.2.1
+                      -- include the following if you want to measure the runtime
+                    --   , time ^>=1.12, deepseq ^>= 1.4.8.0
+    hs-source-dirs:   .
+    default-language: Haskell2010
