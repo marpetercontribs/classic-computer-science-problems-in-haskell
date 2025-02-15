@@ -20,10 +20,14 @@ Done:
   - Fibonacci series, examples Fib1, Fib2, Fib3, Fib4, Fib5, Fib6
   - Trivial (gene) compression
   - Unbreakable encryption
-  - Calculating Pi  
+  - Calculating Pi
+  - The towers of Hanoi
 
 In progress:
 
-- Chapter 1:
-  - The towers of Hanoi
+- Chapter 2:
+  - DNA search
+  - Maze
+  - Missionaries and cannibals
+
 
