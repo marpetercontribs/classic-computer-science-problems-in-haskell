@@ -17,6 +17,10 @@
 
 module Main where
 
+flipFirst (a,b,c) = (b,a,c)
+flipLast (a,b,c) = (a,c,b)
+flipEnds (a,b,c) = (c,b,a)
+
 {- We model a stack as a simple list, with the top of the stack being the head
    of the list. This is a bit simpler than the Data.Stack implementation (which
    also keeps track of the size of the stack), but it's good enough for our purposes.
@@ -42,11 +46,14 @@ solveHanoi :: (Tower, Tower, Tower) -> (Tower, Tower, Tower)
 solveHanoi (start, goal, temp) = solveHanoi' (stackSize start) (start, temp, goal) where
    solveHanoi' n (start, goal, temp)
       | n == 1 = let (top, rest) = stackPop start in (rest, stackPush goal top, temp)
-      | otherwise = 
-            let (start1, temp1, goal1) = solveHanoi' (n-1) (start, temp, goal)
-                (start2, goal2, temp2) = solveHanoi' 1 (start1, goal1, temp1)
-                (temp3, goal3, start3) = solveHanoi' (n-1) (temp2, goal2, start2)
-            in (start3, goal3, temp3)
+      | otherwise = flipEnds (solveHanoi' (n-1) (
+            flipEnds (solveHanoi' 1 (flipLast (
+               solveHanoi' (n-1) (flipLast (start, goal, temp)))))))
+            -- The above code is equivalent to the following code, but "less sequential":
+            -- let (start1, temp1, goal1) = solveHanoi' (n-1) (start, temp, goal)
+            --     (start2, goal2, temp2) = solveHanoi' 1 (start1, goal1, temp1)
+            --     (temp3, goal3, start3) = solveHanoi' (n-1) (temp2, goal2, start2)
+            -- in (start3, goal3, temp3)
 
 main :: IO ()
 main = do
