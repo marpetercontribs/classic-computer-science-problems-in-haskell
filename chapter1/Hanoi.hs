@@ -55,6 +55,24 @@ solveHanoi (start, goal, temp) = solveHanoi' (stackSize start) (start, temp, goa
             --     (temp3, goal3, start3) = solveHanoi' (n-1) (temp2, goal2, start2)
             -- in (start3, goal3, temp3)
 
+{- alternate version : construct the list of moves (top disk from tower x to tower y)
+   needed to solve the problem, then simply perform the moves -}
+
+type Move  = (Int,Int) -- first element = # of tower to move top disk from,
+                       -- second element = # of tower to move disk to
+type Hanoi = [Tower] -- easier than using a triple of Towers
+doMove :: Move -> Hanoi -> Hanoi
+doMove (from, to) hanoi = hanoi''
+   where
+      (movedDisk, reducedTower) = stackPop (hanoi!!from)
+      hanoi' = let (xs,(_:ys)) = splitAt from hanoi in xs ++ (reducedTower : ys)
+      hanoi'' = let (xs,(y:ys)) = splitAt to hanoi' in xs ++ (stackPush y movedDisk : ys)
+
+solvingMoves :: Int -> [Move]
+solvingMoves n = solvingMoves' n 0 1 2
+  where solvingMoves' 0 _ _ _ = []
+        solvingMoves' n a b c = solvingMoves' (n-1) a c b ++ [(a,c)] ++ solvingMoves' (n-1) b a c
+
 main :: IO ()
 main = do
    let towerA = Stack [1..6]
@@ -63,3 +81,8 @@ main = do
    putStrLn ("Hanoi Towers at the beginning: " ++ (show towerA) ++ " - " ++ (show towerB) ++ " - " ++ (show towerC))
    let (towerA', towerB', towerC') = solveHanoi (towerA, towerB, towerC)
    putStrLn ("Hanoi Towers at the end: " ++ (show towerA') ++ " - " ++ (show towerB') ++ " - " ++ (show towerC'))
+   putStrLn ("Alternative version:")
+   let hanoi = [towerA,towerB,towerC] :: Hanoi
+   let moves = solvingMoves 6
+   let hanoi' = foldl (\acc move -> doMove move acc) hanoi moves
+   putStrLn ("Hanoi Towers at the end: " ++ (show hanoi'))
