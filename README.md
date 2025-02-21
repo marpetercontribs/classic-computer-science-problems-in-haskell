@@ -22,11 +22,13 @@ Done:
   - Unbreakable encryption
   - Calculating Pi
   - The towers of Hanoi
+- Chapter 2:
+  - DNA search
 
 In progress:
 
 - Chapter 2:
-  - DNA search
+  - generic search
   - Maze
   - Missionaries and cannibals
 
