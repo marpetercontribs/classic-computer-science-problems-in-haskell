@@ -72,10 +72,11 @@ newMazeWithParams rows columns sparseness start goal rng =
 chunksOf :: Int -> [a] -> [[a]]
 chunksOf n xs = chunksOf' n (xs,[]) where
     chunksOf' n (xs,chunks)
-        | null xs       = reverse chunks -- because the below two cases produce
-                                         -- the chunks in reverse order to avoid
-                                         -- (++) leading to quadratic time 
-        | length xs < n = xs:chunks
+        | null xs       = reverse chunks
+        | length xs < n = reverse (xs:chunks)
+        -- reverse because the below produces the chunks in reverse order to
+        -- avoid repeated use of append (++), which would lead to O(n^2) run
+        -- time with n = length xs
         | otherwise     = chunksOf' n (xs', chunk:chunks)
             where (chunk, xs') = splitAt n xs
 
