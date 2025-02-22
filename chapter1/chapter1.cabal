@@ -1,6 +1,6 @@
 cabal-version:      2.0
 name:               chapter1
-version:            0.1.0.0
+version:            1.0.0.0
 synopsis:           Port of chapter 1 of 'Classic Computer Science Problems' to Haskell
 description:        An attempt at porting the source code of the books Classic Computer Science Problems in Python and Classic Computer Science Problems in Java by David Kopec to Haskell
 homepage:           https://github.com/marpetercontribs/classic-computer-science-problems-in-haskell
