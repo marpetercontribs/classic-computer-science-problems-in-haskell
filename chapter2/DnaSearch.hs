@@ -1,4 +1,4 @@
-{- DnaSearchi.hs
+{- DnaSearch.hs
    Adapted From Classic Computer Science Problems in Python/Java Chapter 2
    Copyright 2025 Markus Peter
 
