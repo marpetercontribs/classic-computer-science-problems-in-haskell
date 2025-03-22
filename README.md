@@ -28,7 +28,7 @@ Done:
 In progress:
 
 - Chapter 2:
-  - Generic search
+  - Generic search, improved version of chunksOf
   - Maze
   - Missionaries and cannibals
 

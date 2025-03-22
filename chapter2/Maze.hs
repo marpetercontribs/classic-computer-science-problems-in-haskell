@@ -17,7 +17,7 @@
 
 module Main where
 
-import GenericSearch(linearContains, binaryContains)
+import GenericSearch(dfs, Node, nodeToPath)
 import System.Random (randoms, getStdGen, RandomGen)
 
 data Cell = Empty | Blocked | Start | Goal | Path deriving (Eq)
@@ -30,7 +30,7 @@ instance Show Cell where
 
 data MazeLocation = MazeLocation { row :: Int, column :: Int } deriving (Eq)
 instance Show MazeLocation where
-    show (MazeLocation row col) = "(" ++ show row ++ ", " ++ show col ++ ")"    
+    show (MazeLocation row col) = "(" ++ show col ++ ", " ++ show row ++ ")"    
 
 data Maze = Maze {
       rows :: Int
@@ -51,7 +51,7 @@ newMaze = newMazeWithParams 10 10 0.2 (MazeLocation 0 0) (MazeLocation 9 9)
    This allows us to get an rng in the main function without having to provide an explicit seed,
    and pass it to the newMazeWithParams function without having to use a monad in the function.
    This way we get a different maze each time we run the program.
-   Alternative would be to use `randoms (mkStdGen <ome seed>)` in the list comprehension below,
+   Alternative would be to use `randoms (mkStdGen <some seed>)` in the list comprehension below,
    leading to exactly the same maze each time we run the program.
 -}
 newMazeWithParams :: RandomGen g => Int -> Int -> Double -> MazeLocation -> MazeLocation -> g -> Maze
@@ -67,6 +67,28 @@ newMazeWithParams rows columns sparseness start goal rng =
                 -- create a list of coordinates and a random number to determine if the cell is blocked
                 [ (x,y) | x<-[0..(columns-1)], y<-[0..(rows-1)]] (randoms rng :: [Double])
             )
+
+markMaze :: Maze -> [MazeLocation] -> Maze
+markMaze maze [] = maze
+markMaze maze (x:xs) 
+    | x == start maze || x == goal maze = markMaze maze xs -- don't mark start and goal
+    | otherwise = markMaze (maze { grid = pathAt (grid maze) x }) xs where
+        pathAt g (MazeLocation r c) = 
+            take r g ++ [take c (g !! r) ++ [Path] ++ drop (c+1) (g !! r)] ++ drop (r+1) g
+
+-- checks if the location is the goal's location in the maze
+goalTest :: Maze -> MazeLocation -> Bool
+goalTest maze loc = loc == goal maze
+
+-- returns the successors of the given location in the maze
+successors :: Maze -> MazeLocation -> [MazeLocation]
+successors maze (MazeLocation row col) = filter isLegalLocation
+    [MazeLocation (row-1) col, MazeLocation (row+1) col,
+     MazeLocation row (col-1), MazeLocation row (col+1)] where
+        isLegalLocation (MazeLocation r c) =
+            r >= 0 && r < rows maze &&
+            c >= 0 && c < columns maze &&
+            (grid maze !! r) !! c /= Blocked
 
 -- helper function that splits a list into a (list of) chunks of size n, same as in DnaSearch.hs
 chunksOf :: Int -> [a] -> [[a]]
@@ -84,4 +106,8 @@ main :: IO ()
 main = do
     randomGen <- getStdGen
     let maze = newMaze randomGen
-    putStr $ show maze
+    putStrLn $ show maze
+    let solution = dfs (start maze) (goalTest maze) (successors maze)
+    case solution of
+        Nothing   -> putStrLn "No solution found"
+        Just node -> putStr $ show (markMaze maze (nodeToPath node))
