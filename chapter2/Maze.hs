@@ -17,7 +17,7 @@
 
 module Main where
 
-import GenericSearch(dfs, Node, nodeToPath)
+import GenericSearch(dfs, bfs, Node, nodeToPath)
 import System.Random (randoms, getStdGen, RandomGen)
 
 data Cell = Empty | Blocked | Start | Goal | Path deriving (Eq)
@@ -107,7 +107,13 @@ main = do
     randomGen <- getStdGen
     let maze = newMaze randomGen
     putStrLn $ show maze
-    let solution = dfs (start maze) (goalTest maze) (successors maze)
-    case solution of
+    putStrLn "Depth-first search:"
+    let solution1 = dfs (start maze) (goalTest maze) (successors maze)
+    case solution1 of
+        Nothing   -> putStrLn "No solution found"
+        Just node -> putStr $ show (markMaze maze (nodeToPath node))
+    putStrLn "Breadth-first search:"
+    let solution2 = bfs (start maze) (goalTest maze) (successors maze)
+    case solution2 of
         Nothing   -> putStrLn "No solution found"
         Just node -> putStr $ show (markMaze maze (nodeToPath node))
