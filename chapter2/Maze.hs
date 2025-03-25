@@ -17,7 +17,7 @@
 
 module Main where
 
-import GenericSearch(dfs, bfs, Node, nodeToPath)
+import GenericSearch(dfs, bfs, astar, Node, nodeToPath)
 import System.Random (randoms, getStdGen, RandomGen)
 
 data Cell = Empty | Blocked | Start | Goal | Path deriving (Eq)
@@ -30,7 +30,7 @@ instance Show Cell where
 
 data MazeLocation = MazeLocation { row :: Int, column :: Int } deriving (Eq)
 instance Show MazeLocation where
-    show (MazeLocation row col) = "(" ++ show col ++ ", " ++ show row ++ ")"    
+    show (MazeLocation row col) = "(" ++ show col ++ ", " ++ show row ++ ")"  
 
 data Maze = Maze {
       rows :: Int
@@ -102,6 +102,9 @@ chunksOf n xs = chunksOf' n (xs,[]) where
         | otherwise     = chunksOf' n (xs', chunk:chunks)
             where (chunk, xs') = splitAt n xs
 
+manhattanDistance :: MazeLocation -> MazeLocation -> Double
+manhattanDistance (MazeLocation x1 y1)  (MazeLocation x2 y2) = fromIntegral (abs (x1 - x2) + abs (y1 - y2))
+
 main :: IO ()
 main = do
     randomGen <- getStdGen
@@ -111,9 +114,14 @@ main = do
     let solution1 = dfs (start maze) (goalTest maze) (successors maze)
     case solution1 of
         Nothing   -> putStrLn "No solution found"
-        Just node -> putStr $ show (markMaze maze (nodeToPath node))
+        Just node -> putStr $ show (markMaze maze (nodeToPath node)) ++ " steps: " ++ show (length (nodeToPath node)) ++ "\n"
     putStrLn "Breadth-first search:"
     let solution2 = bfs (start maze) (goalTest maze) (successors maze)
     case solution2 of
         Nothing   -> putStrLn "No solution found"
-        Just node -> putStr $ show (markMaze maze (nodeToPath node))
+        Just node -> putStr $ show (markMaze maze (nodeToPath node)) ++ " steps: " ++ show (length (nodeToPath node)) ++ "\n"
+    putStrLn "A-star search:"
+    let solution3 = astar (start maze) (goalTest maze) (successors maze) (manhattanDistance (goal maze))
+    case solution3 of
+        Nothing   -> putStrLn "No solution found"
+        Just node -> putStr $ show (markMaze maze (nodeToPath node)) ++ " steps: " ++ show (length (nodeToPath node)) ++ "\n"

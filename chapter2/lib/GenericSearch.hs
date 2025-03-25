@@ -21,6 +21,7 @@ module GenericSearch(
   , Node(..)
   , dfs
   , bfs
+  , astar
   , nodeToPath
 ) where
 
@@ -51,7 +52,7 @@ data Node s = Node {
 -- the A* search algorithm needs ordering for the Node type
 instance (Eq s) => Eq (Node s) where
     (==) (Node s1 _ c1 h1) (Node s2 _ c2 h2) = s1 == s2 && c1 == c2 && h1 == h2
-instance (Ord s) => Ord (Node s) where
+instance (Eq s) => Ord (Node s) where
     compare (Node _ _ c1 h1) (Node _ _ c2 h2) = compare (c1+h1) (c2+h2)
 
 nodeToPath :: Node a -> [a]
@@ -59,7 +60,7 @@ nodeToPath xs = reverse (nodeToPath' xs) where
     nodeToPath' (Node s Nothing       _ _) = [s]
     nodeToPath' (Node s (Just parent) _ _) = s : nodeToPath' parent
 
--- ********** depth-first search **********
+-- ******************** depth-first search ********************
 
 {- We model a stack as a simple list, with the top of the stack being the head
    of the list. This is a bit simpler than the Data.Stack implementation (which
@@ -77,7 +78,7 @@ stackSize :: Stack a -> Int
 stackSize (Stack xs) = length xs
 
 dfs :: (Eq a) => a -> ( a -> Bool) -> (a -> [a]) -> Maybe (Node a)
-dfs initialNode goalTest successors = dfs' (Stack [Node initialNode Nothing 0 0]) [] goalTest successors
+dfs initial goalTest successors = dfs' (Stack [Node initial Nothing 0 0]) [] goalTest successors
 -- the first argument is "frontier" (the "stack" of nodes to visit),
 -- the second argument is "explored" (the list of states we have visited)
 
@@ -93,7 +94,8 @@ dfs' frontier explored goalTest successors
 {- A slightly simpler version without explicilty introducing a Stack, simply using a list.
    Note that we take elements from the front of the list, and always add elements to 
    the front. So the frontier is really treated last-in-first-out -}
-{- dfs initialNode goalTest successors = dfs' [Node initialNode Nothing 0 0] [] goalTest successors
+{-
+dfs initial goalTest successors = dfs' [Node initial Nothing 0 0] [] goalTest successors
 dfs' :: (Eq a) =>  [Node a] -> [a] -> ( a -> Bool) -> (a -> [a]) -> Maybe (Node a)
 dfs' [] _ _ _ = Nothing -- if the frontier is empty, we have failed to find the goal
 dfs' (currentNode:restOfFrontier) explored goalTest successors =
@@ -102,9 +104,7 @@ dfs' (currentNode:restOfFrontier) explored goalTest successors =
         newChildren = filter (\x -> not (elem x explored)) (successors (state currentNode))
         newChildNodes = map (\x -> Node x (Just currentNode) 0 0) newChildren -}
 
-
-
--- ********** breadth-first search **********
+-- ******************** breadth-first search ********************
 {- We model a Queue as a simple list, with the beginning of the Queue being the head
    of the list.
    We can push elements to the end and pop elements from the beginning.
@@ -120,7 +120,7 @@ queueSize :: Queue a -> Int
 queueSize (Queue xs) = length xs
 
 bfs :: (Eq a) => a -> ( a -> Bool) -> (a -> [a]) -> Maybe (Node a)
-bfs initialNode goalTest successors = bfs' (Queue [Node initialNode Nothing 0 0]) [] goalTest successors
+bfs initial goalTest successors = bfs' (Queue [Node initial Nothing 0 0]) [] goalTest successors
 bfs' :: (Eq a) => Queue (Node a) -> [a] -> ( a -> Bool) -> (a -> [a]) -> Maybe (Node a)
 bfs' frontier explored goalTest successors
     | queueSize frontier == 0 = Nothing -- if the frontier is empty, we have failed to find the goal
@@ -133,8 +133,8 @@ bfs' frontier explored goalTest successors
 {- A slightly simpler version without explicilty introducing a Queue, simply using a list.
    Note that we take elements from the front of the list, and always add elements to 
    the end. So the frontier is really treated as a FIFO queue -}
-{- bfs initialNode goalTest successors = bfs' [Node initialNode Nothing 0 0] [] goalTest successors
-
+{-
+bfs initial goalTest successors = bfs' [Node initial Nothing 0 0] [] goalTest successors
 bfs' :: (Eq a) => [Node a] -> [a] -> ( a -> Bool) -> (a -> [a]) -> Maybe (Node a)
 bfs' [] _ _ _ = Nothing -- if the frontier is empty, we have failed to find the goal
 bfs' (currentNode:restOfFrontier) explored goalTest successors =
@@ -143,3 +143,30 @@ bfs' (currentNode:restOfFrontier) explored goalTest successors =
         newChildren = filter (\x -> not (elem x explored)) (successors (state currentNode))
         newChildNodes = reverse (map (\x -> Node x (Just currentNode) 0 0) newChildren)
         -- we reverse the list of new child nodes to really keep the frontier FIFO queue -}
+
+-- ******************** A-star search ********************
+data PriorityQueue a = PriorityQueue [a] deriving (Show)
+queuePush' :: (Eq a, Ord a) => PriorityQueue a -> a -> PriorityQueue a
+queuePush' (PriorityQueue xs) x = PriorityQueue ([ys | ys <- xs, ys < x] ++ [x] ++ [ys | ys <- xs, ys >= x])
+queuePop':: PriorityQueue a -> (a, PriorityQueue a)
+queuePop' (PriorityQueue []) = error "Cannot pop from an empty priority queue"
+queuePop' (PriorityQueue xs) = (head xs, PriorityQueue (tail xs))
+queueSize' :: PriorityQueue a -> Int
+queueSize' (PriorityQueue xs) = length xs
+
+astar :: (Eq a) => a -> ( a -> Bool) -> (a -> [a]) -> (a -> Double) -> Maybe (Node a)
+astar initial goalTest successors heuristic = astar' (PriorityQueue [Node initial Nothing 0 (heuristic initial)]) [(initial, 0)] goalTest successors heuristic
+astar' :: (Eq a) => PriorityQueue (Node a) -> [(a,Double)] -> ( a -> Bool) -> (a -> [a]) -> (a -> Double) -> Maybe (Node a)
+astar' frontier explored goalTest successors heuristic
+    | queueSize' frontier == 0 = Nothing -- if the frontier is empty, we have failed to find the goal
+    | otherwise = if goalTest (state currentNode) then Just currentNode
+                  else astar' newFrontier newExplored goalTest successors heuristic where
+        (currentNode, restFrontier) = queuePop' frontier
+        newCost = cost currentNode + 1
+        (newFrontier, newExplored) = foldl (
+            \(f,e) child -> case lookup child e of -- check if this state is in the explored list already
+                Just cost -> if newCost < cost     -- it is, but we found a less costly path
+                                then (queuePush' f (Node child (Just currentNode) newCost (heuristic child)), (child,newCost):e)
+                                else (f,e)
+                Nothing -> (queuePush' f (Node child (Just currentNode) newCost (heuristic child)), (child,newCost):e))
+            (restFrontier, explored) (successors (state currentNode))
