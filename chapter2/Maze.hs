@@ -92,15 +92,9 @@ successors maze (MazeLocation row col) = filter isLegalLocation
 
 -- helper function that splits a list into a (list of) chunks of size n, same as in DnaSearch.hs
 chunksOf :: Int -> [a] -> [[a]]
-chunksOf n xs = chunksOf' n (xs,[]) where
-    chunksOf' n (xs,chunks)
-        | null xs       = reverse chunks
-        | length xs < n = reverse (xs:chunks)
-        -- reverse because the below produces the chunks in reverse order to
-        -- avoid repeated use of append (++), which would lead to O(n^2) run
-        -- time with n = length xs
-        | otherwise     = chunksOf' n (xs', chunk:chunks)
-            where (chunk, xs') = splitAt n xs
+chunksOf n xs = map (take n) (splitter xs) where
+    splitter [] = []
+    splitter xs = (take n xs) : splitter (drop n xs)
 
 manhattanDistance :: MazeLocation -> MazeLocation -> Double
 manhattanDistance (MazeLocation x1 y1)  (MazeLocation x2 y2) = fromIntegral (abs (x1 - x2) + abs (y1 - y2))
@@ -114,14 +108,14 @@ main = do
     let solution1 = dfs (start maze) (goalTest maze) (successors maze)
     case solution1 of
         Nothing   -> putStrLn "No solution found"
-        Just node -> putStr $ show (markMaze maze (nodeToPath node)) ++ " steps: " ++ show (length (nodeToPath node)) ++ "\n"
+        Just node -> putStr $ show (markMaze maze (nodeToPath node)) ++ "Steps: " ++ show (length (nodeToPath node)) ++ "\n"
     putStrLn "Breadth-first search:"
     let solution2 = bfs (start maze) (goalTest maze) (successors maze)
     case solution2 of
         Nothing   -> putStrLn "No solution found"
-        Just node -> putStr $ show (markMaze maze (nodeToPath node)) ++ " steps: " ++ show (length (nodeToPath node)) ++ "\n"
+        Just node -> putStr $ show (markMaze maze (nodeToPath node)) ++ "Steps: " ++ show (length (nodeToPath node)) ++ "\n"
     putStrLn "A-star search:"
     let solution3 = astar (start maze) (goalTest maze) (successors maze) (manhattanDistance (goal maze))
     case solution3 of
         Nothing   -> putStrLn "No solution found"
-        Just node -> putStr $ show (markMaze maze (nodeToPath node)) ++ " steps: " ++ show (length (nodeToPath node)) ++ "\n"
+        Just node -> putStr $ show (markMaze maze (nodeToPath node)) ++ "Steps: " ++ show (length (nodeToPath node)) ++ "\n"

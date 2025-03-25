@@ -24,17 +24,14 @@ data Nucleotide = A | C | G | T deriving (Eq, Ord, Show) -- Ord is needed for bi
 type Codon = (Nucleotide, Nucleotide, Nucleotide)
 type Gene = [Codon]
 
--- helper function that splits a list into a (list of) chunks of size n
+-- Helper function that splits a list into a (list of) chunks of size n.
+-- Simplified version of the `chunksOf` function in the `Data.List.Split` package.
+-- It looks inefficient because it seems to create lots of intermediate lists,
+-- but is actually quite efficient due to how Haskell evaluates lazily and caches.
 chunksOf :: Int -> [a] -> [[a]]
-chunksOf n xs = chunksOf' n (xs,[]) where
-    chunksOf' n (xs,chunks)
-        | null xs       = reverse chunks
-        | length xs < n = reverse (xs:chunks)
-        -- reverse because the below produces the chunks in reverse order to
-        -- avoid repeated use of append (++), which would lead to O(n^2) run
-        -- time with n = length xs
-        | otherwise     = chunksOf' n (xs', chunk:chunks)
-            where (chunk, xs') = splitAt n xs
+chunksOf n xs = map (take n) (splitter xs) where
+    splitter [] = []
+    splitter xs = (take n xs) : splitter (drop n xs)
 
 stringToGene :: String -> Gene
 stringToGene s = map stringToCodon (chunksOf 3 (map toUpper s)) where

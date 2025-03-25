@@ -24,12 +24,12 @@ Done:
   - The towers of Hanoi
 - Chapter 2:
   - DNA search
+  - Generic search
+  - Maze
 
 In progress:
 
 - Chapter 2:
-  - Generic search, improved version of chunksOf
-  - Maze
   - Missionaries and cannibals
 
 
