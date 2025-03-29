@@ -26,10 +26,11 @@ Done:
   - DNA search
   - Generic search
   - Maze
+  - Missionaries and cannibals
 
 In progress:
 
-- Chapter 2:
-  - Missionaries and cannibals
+- Chapter 3
+
 
 
