@@ -31,6 +31,15 @@ Done:
 In progress:
 
 - Chapter 3
+  - CSP framework
+
+To do:
+
+- Chapter 3
+  - Map coloring
+  - Eight queens problem
+  - Word search
+  - SEND+MORE=MONEY
 
 
 
