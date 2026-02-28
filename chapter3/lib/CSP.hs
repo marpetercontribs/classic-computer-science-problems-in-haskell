@@ -1,6 +1,6 @@
 {- CSP.hs (Constraint Satisfaction Problem)
    Adapted From Classic Computer Science Problems in Python/Java Chapter 3
-   Copyright 2025 Markus Peter
+   Copyright 2026 Markus Peter
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -20,7 +20,15 @@
 module CSP( 
     CSP(..)
   , Constraint(..)
+  , Satisfiable(..)
+  , makeCSP
+  , makeConstraint
+  , addToCspConstraint
+  , backTrackingSearch
 ) where
+
+import Data.List (find)
+import qualified Data.Map.Strict as Map
 
 {- v is the type of the variable
    d is the type of the domain
@@ -28,13 +36,77 @@ module CSP(
    csp is the type of the constraint satisfaction problem
 -}
 
-class Constraint c where
-  newConstraint :: [v] -> c
-  satisfied :: Constraint c => c -> [(v, d)] -> Bool
-  variables :: Constraint c => c -> [v]
+data (Ord v) => Constraint v d = Constraint {
+      variables :: [v] }
 
-class CSP csp where
-    newCSP :: [v] -> [(v, [d])] -> csp
-    add_constraint :: (CSP csp, Constraint c) => csp -> c -> csp
-    is_consistent :: CSP csp => csp -> v -> [(v, d)] -> Bool
-    backtracking_search :: CSP csp => csp -> Maybe [(v, d)]
+{- isSatisfied checks for a constraint and
+   an assignment = a map of variables each to a value within the corresponding domain,
+   if the assignment satisfies the constraint -}
+class Satisfiable v d where
+    isSatisfied :: Constraint v d -> Map.Map v d -> Bool
+
+makeConstraint :: (Ord v) => [v] -> Constraint v d
+makeConstraint variables = Constraint {
+      variables = variables }
+   --  , satisfied = satisfied }
+
+data (Ord v, Satisfiable v d) => CSP v d = CSP {
+      domains :: Map.Map v [d]
+    , constraints :: Map.Map v [Constraint v d] }
+
+{- makeCSP creates a new constraint satisfaction problem using
+   a mapping of variables to their domains.
+   Note that each variable's domain is a list of possible values -}
+makeCSP :: (Ord v, Satisfiable v d) => Map.Map v [d] -> CSP v d
+makeCSP domains = CSP {
+      domains = domains
+    , constraints = Map.fromList [(v, []) | v <- Map.keys domains] }
+
+
+{- addToCspConstraint "adds" a constraint to a CSP -}
+addToCspConstraint :: (Ord v, Satisfiable v d) => CSP v d -> Constraint v d -> CSP v d
+addToCspConstraint csp constraint = foldl' addConstraintToVariable csp (variables constraint)
+   where
+{-       addConstraintToVariables csp [] _ = csp
+      addConstraintToVariables csp (v:vs) constraint =
+         addConstraintToVariables (addConstraintToVariable csp constraint v) vs constraint -}
+      addConstraintToVariable csp variable =
+         if all (`elem` Map.keys (domains csp)) (variables constraint)
+         then csp { constraints = Map.insertWith (++) variable [constraint] (constraints csp) }
+         else error "Variable in constraint not in CSP"
+
+{-isConsistent checks, for a given CSP and one of its variables, if the given
+   assignment = a map of variables each to a value within the corresponding domain,
+   is consistent with the CSP -}
+isConsistent :: (Ord v, Satisfiable v d) => CSP v d -> v -> Map.Map v d -> Bool
+isConsistent csp variable assignment = 
+   all (\c -> isSatisfied c assignment)
+      ((constraints csp) Map.! variable) -- gets the list of constraints for the variable
+
+{- backtracking_search performs a backtracking search for a given CSP
+   to find a solution = assignment for each variable of the CSP to a value within the corresponding domain
+   that satisfies all constraints of the given CSP. -}
+backTrackingSearch :: (Ord v, Satisfiable v d) => CSP v d -> Maybe (Map.Map v d)
+backTrackingSearch csp = internalBackTrackingSearch csp Map.empty
+
+internalBackTrackingSearch :: (Ord v, Satisfiable v d) => CSP v d -> Map.Map v d -> Maybe (Map.Map v d)
+internalBackTrackingSearch csp assignment
+   | -- assignment is complete if every variable is assigned (our base case)
+     length assignment == Map.size (domains csp) = Just assignment
+   | otherwise = do
+      -- get first unassigned variable
+      let firstUnassignedVariable = find (\v -> not (Map.member v assignment)) (Map.keys (domains csp))
+      case firstUnassignedVariable of
+         Just v -> let domain = (domains csp) Map.! v -- get the unassigned variable's domain
+                   -- try to assign each value to the variable and recursively call backtracking search
+                   in tryValues csp v domain assignment
+         Nothing -> Nothing
+   where
+      tryValues _ _ [] _  = Nothing 
+      tryValues csp variable (value:values) assignment =
+         let newAssignment = Map.insert variable value assignment in
+         if isConsistent csp variable newAssignment
+         then case internalBackTrackingSearch csp newAssignment of
+            Just result -> Just result
+            Nothing -> tryValues csp variable values assignment
+         else tryValues csp variable values assignment

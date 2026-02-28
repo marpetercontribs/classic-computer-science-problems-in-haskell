@@ -150,7 +150,7 @@ queuePush' :: (Eq a, Ord a) => PriorityQueue a -> a -> PriorityQueue a
 queuePush' (PriorityQueue xs) x = PriorityQueue ([ys | ys <- xs, ys < x] ++ [x] ++ [ys | ys <- xs, ys >= x])
 queuePop':: PriorityQueue a -> (a, PriorityQueue a)
 queuePop' (PriorityQueue []) = error "Cannot pop from an empty priority queue"
-queuePop' (PriorityQueue xs) = (head xs, PriorityQueue (tail xs))
+queuePop' (PriorityQueue (x:xs)) = (x, PriorityQueue xs)
 queueSize' :: PriorityQueue a -> Int
 queueSize' (PriorityQueue xs) = length xs
 

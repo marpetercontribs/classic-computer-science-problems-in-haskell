@@ -13,58 +13,58 @@ build-type:         Simple
 
 executable fib1
     main-is:          Fib1.hs
-    build-depends:    base ^>=4.17.2.1
+    build-depends:    base >=4.17.2.1
     hs-source-dirs:   .
     default-language: Haskell2010
 
 executable fib2
     main-is:          Fib2.hs
-    build-depends:    base ^>=4.17.2.1
+    build-depends:    base >=4.17.2.1
     hs-source-dirs:   .
     default-language: Haskell2010
 
 executable fib3
     main-is:          Fib3.hs
-    build-depends:    base ^>=4.17.2.1
+    build-depends:    base >=4.17.2.1
     hs-source-dirs:   .
     default-language: Haskell2010
 
 executable fib4
     main-is:          Fib4.hs
-    build-depends:    base ^>=4.17.2.1, memoize ^>=1.1.2
+    build-depends:    base >=4.17.2.1, memoize ^>=1.1.2
     hs-source-dirs:   .
     default-language: Haskell2010
 
 executable fib5
     main-is:          Fib5.hs
-    build-depends:    base ^>=4.17.2.1
+    build-depends:    base >=4.17.2.1
     hs-source-dirs:   .
     default-language: Haskell2010
 
 executable fib6
     main-is:          Fib6.hs
-    build-depends:    base ^>=4.17.2.1
+    build-depends:    base >=4.17.2.1
     hs-source-dirs:   .
     default-language: Haskell2010
 
 executable trivialCompression
     main-is:          TrivialCompression.hs
     other-modules:    CompressedGene
-    build-depends:    base ^>=4.17.2.1,
+    build-depends:    base >=4.17.2.1,
                       -- needed by main to calculate the size of the data structures:
-                      deepseq ^>= 1.4.8.0, ghc-datasize ^>= 0.2.7
+                      deepseq >= 1.4.8.0, ghc-datasize >= 0.2.7
     hs-source-dirs:   .
     default-language: Haskell2010
 
 executable unbreakableEncryption
     main-is:          UnbreakableEncryption.hs
-    build-depends:    base ^>=4.17.2.1, random ^>=1.2.0
+    build-depends:    base >=4.17.2.1, random >=1.2.0
     hs-source-dirs:   .
     default-language: Haskell2010
 
 executable calculatePi
     main-is:          CalculatePi.hs
-    build-depends:    base ^>=4.17.2.1
+    build-depends:    base >=4.17.2.1
                       -- include the following if you want to measure the runtime
                     --   , time ^>=1.12, deepseq ^>= 1.4.8.0
     hs-source-dirs:   .
@@ -72,6 +72,6 @@ executable calculatePi
 
 executable hanoi
     main-is:          Hanoi.hs
-    build-depends:    base ^>=4.17.2.1
+    build-depends:    base >=4.17.2.1
     hs-source-dirs:   .
     default-language: Haskell2010

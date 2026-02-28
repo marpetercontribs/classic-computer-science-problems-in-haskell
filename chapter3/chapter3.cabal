@@ -8,19 +8,19 @@ license:            Apache-2.0
 license-file:       ../LICENSE
 author:             Markus Peter
 maintainer:         marpeter@web.de
-copyright:          (c) 2025 by Markus Peter
+copyright:          (c) 2026 by Markus Peter
 build-type:         Simple
 
 library
-    build-depends:    base ^>=4.17.2.1
+    build-depends:    containers, base >=4.18.2.1
     hs-source-dirs:   lib
     exposed-modules:  CSP 
                    -- ConstraintSatisfactionProblem
     default-language: Haskell2010
 
-executable chapter3
-    main-is:          Main.hs
+executable mapColoring
+    main-is:          MapColoring.hs
     other-modules:    CSP
-    build-depends:    base ^>=4.17.2.1
+    build-depends:    containers, base >=4.18.2.1
     hs-source-dirs:   ., lib
     default-language: Haskell2010
