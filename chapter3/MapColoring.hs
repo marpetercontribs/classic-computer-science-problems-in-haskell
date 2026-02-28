@@ -35,6 +35,7 @@ data Region = WesternAustralia | NorthernTerritory | SouthAustralia |
     Queensland | NewSouthWales | Victoria | Tasmania deriving (Eq, Ord, Show)
 
 instance Satisfiable Region Color where
+{-     cvariables constraint = variables constraint -}
     isSatisfied constraint assignment = 
         let [var1, var2] = variables constraint in
         case (Map.lookup var1 assignment, Map.lookup var2 assignment) of
@@ -55,16 +56,16 @@ main = do
 
     let csp' = makeCSP theDomains
     let csp = foldl addToCspConstraint csp' [
-            (makeConstraint [WesternAustralia, NorthernTerritory] :: Constraint Region Color),
-            (makeConstraint [WesternAustralia, SouthAustralia] :: Constraint Region Color),
-            (makeConstraint [NorthernTerritory, SouthAustralia] :: Constraint Region Color),
-            (makeConstraint [NorthernTerritory, Queensland] :: Constraint Region Color),
-            (makeConstraint [SouthAustralia, Queensland] :: Constraint Region Color),
-            (makeConstraint [SouthAustralia, NewSouthWales] :: Constraint Region Color),
-            (makeConstraint [SouthAustralia, Victoria] :: Constraint Region Color),
-            (makeConstraint [Queensland, NewSouthWales] :: Constraint Region Color),
-            (makeConstraint [NewSouthWales, Victoria] :: Constraint Region Color),
-            (makeConstraint [Victoria, Tasmania] :: Constraint Region Color)]
+            (makeConstraint [WesternAustralia, NorthernTerritory]),
+            (makeConstraint [WesternAustralia, SouthAustralia]),
+            (makeConstraint [NorthernTerritory, SouthAustralia]),
+            (makeConstraint [NorthernTerritory, Queensland]),
+            (makeConstraint [SouthAustralia, Queensland]),
+            (makeConstraint [SouthAustralia, NewSouthWales]),
+            (makeConstraint [SouthAustralia, Victoria]),
+            (makeConstraint [Queensland, NewSouthWales]),
+            (makeConstraint [NewSouthWales, Victoria]),
+            (makeConstraint [Victoria, Tasmania])]
     let solution = backTrackingSearch csp
     case solution of
         Just assignment -> print assignment

@@ -16,6 +16,7 @@
 -}
 
 {-# LANGUAGE MultiParamTypeClasses #-}
+{-# LANGUAGE AllowAmbiguousTypes #-}
 
 module CSP( 
     CSP(..)
@@ -32,27 +33,25 @@ import qualified Data.Map.Strict as Map
 
 {- v is the type of the variable
    d is the type of the domain
-   c is the type of the constraint
-   csp is the type of the constraint satisfaction problem
 -}
 
-data (Ord v) => Constraint v d = Constraint {
+data (Ord v) => Constraint v = Constraint {
       variables :: [v] }
 
 {- isSatisfied checks for a constraint and
    an assignment = a map of variables each to a value within the corresponding domain,
    if the assignment satisfies the constraint -}
-class Satisfiable v d where
-    isSatisfied :: Constraint v d -> Map.Map v d -> Bool
+class (Ord v) => Satisfiable v d where
+    isSatisfied :: Constraint v -> Map.Map v d -> Bool
+{-     cvariables :: Constraint v -> [v] -- TODO: can explit need for algebraic data type be removed? -}
 
-makeConstraint :: (Ord v) => [v] -> Constraint v d
+makeConstraint :: (Ord v) => [v] -> Constraint v
 makeConstraint variables = Constraint {
       variables = variables }
-   --  , satisfied = satisfied }
 
 data (Ord v, Satisfiable v d) => CSP v d = CSP {
       domains :: Map.Map v [d]
-    , constraints :: Map.Map v [Constraint v d] }
+    , constraints :: Map.Map v [Constraint v] }
 
 {- makeCSP creates a new constraint satisfaction problem using
    a mapping of variables to their domains.
@@ -64,7 +63,7 @@ makeCSP domains = CSP {
 
 
 {- addToCspConstraint "adds" a constraint to a CSP -}
-addToCspConstraint :: (Ord v, Satisfiable v d) => CSP v d -> Constraint v d -> CSP v d
+addToCspConstraint :: (Ord v, Satisfiable v d) => CSP v d -> Constraint v -> CSP v d
 addToCspConstraint csp constraint = foldl' addConstraintToVariable csp (variables constraint)
    where
 {-       addConstraintToVariables csp [] _ = csp
