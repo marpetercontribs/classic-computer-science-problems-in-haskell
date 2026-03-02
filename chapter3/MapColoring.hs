@@ -21,7 +21,7 @@ module Main where
 
 import CSP ( 
     CSP(..),
-    Constrainable(..),
+    Constraint(..),
     makeCSP,
     addToCspConstraint,
     backTrackingSearch)
@@ -36,7 +36,7 @@ data MapColoringConstraint = MapColoringConstraint {
       region1 :: Region
     , region2 :: Region } deriving (Eq, Show)
 
-instance Constrainable MapColoringConstraint Region Color where
+instance Constraint MapColoringConstraint Region Color where
     satisfied constraint assignment = 
         case (Map.lookup (region1 constraint) assignment, Map.lookup (region2 constraint) assignment) of
             (Just color1, Just color2) -> color1 /= color2

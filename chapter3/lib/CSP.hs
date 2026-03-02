@@ -20,7 +20,7 @@
 
 module CSP( 
     CSP(..)
-  , Constrainable(..)
+  , Constraint(..)
   , makeCSP
   , addToCspConstraint
   , backTrackingSearch
@@ -34,7 +34,7 @@ import qualified Data.Map.Strict as Map
    c is the type of the constraint
 -}
 
-class (Ord v) => Constrainable c v d | c v -> d where -- functional dependency: for a given constraint type c and variable type v, there is only one possible domain type d
+class (Ord v) => Constraint c v d | c v -> d where -- functional dependency: for a given constraint type c and variable type v, there is only one possible domain type d
 {- satisfied checks for a constraint and
    an assignment = a map of variables each to a value within the corresponding domain,
    if the assignment satisfies the constraint -}
@@ -42,21 +42,21 @@ class (Ord v) => Constrainable c v d | c v -> d where -- functional dependency: 
 {- variables returns the list of variables that are involved in the constraint -}
    variables :: c -> [v]
 
-data (Ord v, Constrainable c v d) => CSP c v d = CSP {
+data (Ord v, Constraint c v d) => CSP c v d = CSP {
       domains :: Map.Map v [d]
     , constraints :: Map.Map v [c] }
 
 {- makeCSP creates a new constraint satisfaction problem using
    a mapping of variables to their domains.
    Note that each variable's domain is a list of possible values -}
-makeCSP :: (Ord v, Constrainable c v d) => Map.Map v [d] -> CSP c v d
+makeCSP :: (Ord v, Constraint c v d) => Map.Map v [d] -> CSP c v d
 makeCSP domains = CSP {
       domains = domains
     , constraints = Map.fromList [(v, []) | v <- Map.keys domains] }
 
 
 {- addToCspConstraint "adds" a constraint to a CSP -}
-addToCspConstraint :: (Ord v, Constrainable c v d) => CSP c v d -> c -> CSP c v d
+addToCspConstraint :: (Ord v, Constraint c v d) => CSP c v d -> c -> CSP c v d
 addToCspConstraint csp constraint = foldl addConstraintToVariable csp (variables constraint)
    where
       -- addConstraintToVariable:: CSP c v d -> v -> CSP c v d
@@ -68,7 +68,7 @@ addToCspConstraint csp constraint = foldl addConstraintToVariable csp (variables
 {-isConsistent checks, for a given CSP and one of its variables, if the given
    assignment = a map of variables each to a value within the corresponding domain,
    is consistent with the CSP -}
-isConsistent :: (Ord v, Constrainable c v d) => CSP c v d -> v -> Map.Map v d -> Bool
+isConsistent :: (Ord v, Constraint c v d) => CSP c v d -> v -> Map.Map v d -> Bool
 isConsistent csp variable assignment = 
    all (\c -> satisfied c assignment)
       ((constraints csp) Map.! variable) -- gets the list of constraints for the variable
@@ -76,10 +76,10 @@ isConsistent csp variable assignment =
 {- backtracking_search performs a backtracking search for a given CSP
    to find a solution = assignment for each variable of the CSP to a value within the corresponding domain
    that satisfies all constraints of the given CSP. -}
-backTrackingSearch :: (Ord v, Constrainable c v d) => CSP c v d -> Maybe (Map.Map v d)
+backTrackingSearch :: (Ord v, Constraint c v d) => CSP c v d -> Maybe (Map.Map v d)
 backTrackingSearch csp = internalBackTrackingSearch csp Map.empty
 
-internalBackTrackingSearch :: (Ord v, Constrainable c v d) => CSP c v d -> Map.Map v d -> Maybe (Map.Map v d)
+internalBackTrackingSearch :: (Ord v, Constraint c v d) => CSP c v d -> Map.Map v d -> Maybe (Map.Map v d)
 internalBackTrackingSearch csp assignment
    | -- assignment is complete if every variable is assigned (our base case)
      length assignment == Map.size (domains csp) = Just assignment
