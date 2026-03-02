@@ -21,10 +21,8 @@ module Main where
 
 import CSP ( 
     CSP(..),
-    Constraint(..),
-    Satisfiable(..),
+    Constrainable(..),
     makeCSP,
-    makeConstraint,
     addToCspConstraint,
     backTrackingSearch)
 
@@ -34,13 +32,16 @@ data Color = Red | Green | Blue deriving (Eq, Show)
 data Region = WesternAustralia | NorthernTerritory | SouthAustralia |
     Queensland | NewSouthWales | Victoria | Tasmania deriving (Eq, Ord, Show)
 
-instance Satisfiable Region Color where
-{-     cvariables constraint = variables constraint -}
-    isSatisfied constraint assignment = 
-        let [var1, var2] = variables constraint in
-        case (Map.lookup var1 assignment, Map.lookup var2 assignment) of
+data MapColoringConstraint = MapColoringConstraint {
+      region1 :: Region
+    , region2 :: Region } deriving (Eq, Show)
+
+instance Constrainable MapColoringConstraint Region Color where
+    satisfied constraint assignment = 
+        case (Map.lookup (region1 constraint) assignment, Map.lookup (region2 constraint) assignment) of
             (Just color1, Just color2) -> color1 /= color2
             _ -> True -- if any the variables is not assigned yet, the constraint is satisfied
+    variables constraint = [region1 constraint, region2 constraint]
 
 main :: IO ()
 main = do
@@ -56,16 +57,16 @@ main = do
 
     let csp' = makeCSP theDomains
     let csp = foldl addToCspConstraint csp' [
-            (makeConstraint [WesternAustralia, NorthernTerritory]),
-            (makeConstraint [WesternAustralia, SouthAustralia]),
-            (makeConstraint [NorthernTerritory, SouthAustralia]),
-            (makeConstraint [NorthernTerritory, Queensland]),
-            (makeConstraint [SouthAustralia, Queensland]),
-            (makeConstraint [SouthAustralia, NewSouthWales]),
-            (makeConstraint [SouthAustralia, Victoria]),
-            (makeConstraint [Queensland, NewSouthWales]),
-            (makeConstraint [NewSouthWales, Victoria]),
-            (makeConstraint [Victoria, Tasmania])]
+            (MapColoringConstraint WesternAustralia NorthernTerritory),
+            (MapColoringConstraint WesternAustralia SouthAustralia),
+            (MapColoringConstraint NorthernTerritory SouthAustralia),
+            (MapColoringConstraint NorthernTerritory Queensland),
+            (MapColoringConstraint SouthAustralia Queensland),
+            (MapColoringConstraint SouthAustralia NewSouthWales),
+            (MapColoringConstraint SouthAustralia Victoria),
+            (MapColoringConstraint Queensland NewSouthWales),
+            (MapColoringConstraint NewSouthWales Victoria),
+            (MapColoringConstraint Victoria Tasmania)]
     let solution = backTrackingSearch csp
     case solution of
         Just assignment -> print assignment
