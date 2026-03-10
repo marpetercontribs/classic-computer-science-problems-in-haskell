@@ -27,19 +27,24 @@ Done:
   - Generic search
   - Maze
   - Missionaries and cannibals
+- Chapter 3
+  - CSP framework
+  - Map Coloring example
+  - 8 Queens example
+  - Word puzzle
+  - SEND + MORE = MONEY example
 
 In progress:
 
-- Chapter 3
-  - CSP framework
+- Chapter 4
+  - Graph framework
 
 To do:
 
-- Chapter 3
-  - Map coloring
-  - Eight queens problem
-  - Word search
-  - SEND+MORE=MONEY
+- Chapter 4
+  - Find the shortest path
+  - Minimize cost
+  - Find shortest path with weighted graph
 
 
 
