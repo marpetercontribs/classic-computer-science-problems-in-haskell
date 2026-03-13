@@ -7,44 +7,42 @@ The source code is organized by chapter, treating each chapter as a package and 
 If you installed Haskell using [GHCup](https://www.haskell.org/ghcup/), thus have cabal installed, you can compile and run the examples in a terminal by cd-ing into the corresponding chapter folder and executing `cabal run <name of the example>`, for example `cd chapter1` `cabal run fib2`.  
 You can also run the examples using the interactive Haskell interpreter. To do so, cd into the corresponding chapter folder and
 start `cabal repl <example>`, e.g. `cabal repl Fib2`.
-Execute the example by calling the `main` function after the example is loaded into the interactive interpreter. You can also try the other functions defined in example, of course.
+Execute the example by calling the `main` function after the example is loaded into the interactive interpreter. You can also try the other functions defined in the example, of course.
 
 If the example has no build dependency other than `base` (see line `build-depends:` of the corresponding example in the chapter\<n>.cabal file), you can also simply start `ghci` and load the example using `:load <Example>`, e.g. `:load Fib2` (note that the file names start with an uppercase character), or start `ghci` in the root folder and load the example using `:load chapter<n>/<Example>`.
 In any case, you can execute the example by calling the `main` function after the example is loaded into the interactive interpreter.  
 
-Code meant for reuse such as `generic_search` of chapter 2 and `csp` of chapter 3 is treated as a library.
+Code meant for reuse such as `GenericSearch` of chapter 2 and `csp` of chapter 3 is treated as a library.
 
 Done:
 
 - Chapter 1:
-  - Fibonacci series, examples Fib1, Fib2, Fib3, Fib4, Fib5, Fib6
-  - Trivial (gene) compression
-  - Unbreakable encryption
-  - Calculating Pi
-  - The towers of Hanoi
+  - Fibonacci series, examples fib1, fib2, fib3, fib4, fib5, fib6
+  - Trivial (gene) compression - trivialCompression
+  - unbreakableEncryption
+  - calculatePi
+  - The towers of Hanoi - hanoi
 - Chapter 2:
-  - DNA search
-  - Generic search
-  - Maze
-  - Missionaries and cannibals
+  - DNA search - dnaSearch
+  - Generic search (library - run `cabal test` to execute the simple examples from the book as unit tests)
+  - maze
+  - Missionaries and cannibals - missionaries
 - Chapter 3
-  - CSP framework
-  - Map Coloring example
-  - 8 Queens example
-  - Word puzzle
-  - SEND + MORE = MONEY example
+  - CSP framework (library)
+  - mapColoring example
+  - 8 Queens example - queens
+  - Word puzzle - wordSearch
+  - SEND + MORE = MONEY example - sendMoreMoney
 
 In progress:
 
 - Chapter 4
-  - Graph framework
-
-To do:
+  - Graph framework (library)
+  - Find the shortest path - run `cabal test` to execute the example as unit test of the graph framework.
 
 - Chapter 4
-  - Find the shortest path
-  - Minimize cost
-  - Find shortest path with weighted graph
+  - Minimize cost - run `cabal test` to execute the example as unit test of the graph framework.
+  - Find shortest path with weighted graph - dijkstra
 
 
 

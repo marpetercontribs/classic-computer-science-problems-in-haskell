@@ -15,41 +15,6 @@ import GenericSearch (bfs, nodeToPath)
 
 main :: IO ()
 main = do
-    let cityGraph = makeGraph ["Seattle", "San Francisco", "Los Angeles",
-            "Riverside", "Phoenix", "Chicago", "Boston", "New York", "Atlanta",
-            "Miami", "Dallas", "Houston", "Detroit", "Philadelphia", "Washington"] :: UnweightedGraph String
-    let cityGraphWithEdge = foldr add_edge_by_vertices cityGraph [
-            ("Seattle", "Chicago"), 
-            ("Seattle", "San Francisco"),
-            ("San Francisco", "Riverside"),
-            ("San Francisco", "Los Angeles"),
-            ("Los Angeles", "Riverside"),
-            ("Los Angeles", "Phoenix"),
-            ("Riverside", "Phoenix"),
-            ("Riverside", "Chicago"),
-            ("Phoenix", "Dallas"),
-            ("Phoenix", "Houston"),
-            ("Dallas", "Chicago"),
-            ("Dallas", "Atlanta"),
-            ("Dallas", "Houston"),
-            ("Houston", "Atlanta"),
-            ("Houston", "Miami"),
-            ("Atlanta", "Chicago"),
-            ("Atlanta", "Washington"),
-            ("Atlanta", "Miami"),
-            ("Miami", "Washington"),
-            ("Chicago", "Detroit"),
-            ("Detroit", "Boston"),
-            ("Detroit", "Washington"),
-            ("Detroit", "New York"),
-            ("Boston", "New York"),
-            ("New York", "Philadelphia"),
-            ("Philadelphia", "Washington")]
-    let result = bfs "Boston" (\v -> v == "Miami") (neighbors_of cityGraphWithEdge)
-    putStrLn $ "Result: " ++ case result of
-            Just node -> "Path from Boston to Miami: " ++ show (nodeToPath node)
-            Nothing -> "No path found from Boston to Miami"
-
     let cityGraphWeighted = makeGraph ["Seattle", "San Francisco", "Los Angeles",
             "Riverside", "Phoenix", "Chicago", "Boston", "New York", "Atlanta",
             "Miami", "Dallas", "Houston", "Detroit", "Philadelphia", "Washington"] :: WeightedGraph String

@@ -33,7 +33,6 @@ module Graph (
     , add_edge_by_vertices'
 ) where
 
-
 import Data.List (findIndex)
 
 class Edge a where
@@ -148,12 +147,12 @@ neighbors_of_index_with_weight :: (Eq v) => WeightedGraph v -> Int -> [(v, Float
 neighbors_of_index_with_weight g i = 
     map (\edge -> (vertex_at_index g (to edge), weight edge)) (edges g !! i)
 
-instance (Eq v, Show v) => Show (WeightedGraph v) where
-    show g = unlines (map (\i -> show (vertex_at_index g i) ++ ": " ++ show (neighbors_of_index_with_weight g i)) [0..length (vertices g) - 1])
-
 add_edge_by_vertices' :: (Eq v) => (v,v, Float) -> WeightedGraph v -> WeightedGraph v
 add_edge_by_vertices' (v1, v2, weight) g =
     let i1 = index_of_vertex g v1
         i2 = index_of_vertex g v2
         edge = SimpleWeightedEdge { edge = SimpleEdge {u = i1, v = i2}, w = weight }
     in add_edge g edge
+
+instance (Eq v, Show v) => Show (WeightedGraph v) where
+    show g = unlines (map (\i -> show (vertex_at_index g i) ++ ": " ++ show (neighbors_of_index_with_weight g i)) [0..length (vertices g) - 1])
