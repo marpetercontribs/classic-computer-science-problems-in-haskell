@@ -102,6 +102,8 @@ class (Edge e, Eq v) => Graph g e v | g -> e v where
     edges_of :: g -> v -> [e]
     edges_of g v = edges_of_index g (index_of_vertex g v)
 
+
+
 data (Eq v) => UnweightedGraph v = UnweightedGraph { verticesList :: [v], edgesList :: [[SimpleEdge]] }
 instance (Eq v) => Graph (UnweightedGraph v) SimpleEdge v where
     vertices (UnweightedGraph { verticesList = vs }) = vs
@@ -115,8 +117,10 @@ instance (Eq v) => Graph (UnweightedGraph v) SimpleEdge v where
                 if from e == vertexIndex then edgesOfVertex ++ [e]
                 else if to e == vertexIndex then edgesOfVertex ++ [reversed e]
                 else edgesOfVertex
-    -- makeGraph :: (Eq v) => [v] -> UnweightedGraph v
     makeGraph vs = UnweightedGraph { verticesList = vs, edgesList = map (const []) vs } -- initialize the graph with the vertices and empty edge lists
+
+instance (Eq v, Show v) => Show (UnweightedGraph v) where
+    show g = unlines (map (\v -> show v ++ ": " ++ show (neighbors_of g v)) (vertices g))
 
 add_edge_by_vertices :: (Eq v) => (v,v) -> UnweightedGraph v -> UnweightedGraph v
 add_edge_by_vertices (v1, v2) g =
@@ -138,8 +142,14 @@ instance (Eq v) =>  Graph (WeightedGraph v) SimpleWeightedEdge v where
                 if from e == vertexIndex then edgesOfVertex ++ [e]
                 else if to e == vertexIndex then edgesOfVertex ++ [reversed e]
                 else edgesOfVertex
-    -- makeGraph :: (Eq v) => [v] -> WeightedGraph v
     makeGraph vs = WeightedGraph { verticesListW = vs, edgesListW = map (const []) vs }
+
+neighbors_of_index_with_weight :: (Eq v) => WeightedGraph v -> Int -> [(v, Float)]
+neighbors_of_index_with_weight g i = 
+    map (\edge -> (vertex_at_index g (to edge), weight edge)) (edges g !! i)
+
+instance (Eq v, Show v) => Show (WeightedGraph v) where
+    show g = unlines (map (\i -> show (vertex_at_index g i) ++ ": " ++ show (neighbors_of_index_with_weight g i)) [0..length (vertices g) - 1])
 
 add_edge_by_vertices' :: (Eq v) => (v,v, Float) -> WeightedGraph v -> WeightedGraph v
 add_edge_by_vertices' (v1, v2, weight) g =

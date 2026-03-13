@@ -18,6 +18,7 @@
 
 import Test.HUnit
 import Graph
+import GenericSearch (bfs, nodeToPath)
 
 cities = ["Seattle", "San Francisco", "Los Angeles",
         "Riverside", "Phoenix", "Chicago", "Boston", "New York", "Atlanta",
@@ -53,12 +54,15 @@ testUnweightedGraphWithEdges = TestCase( do
             ("New York", "Philadelphia"),
             ("Philadelphia", "Washington")]
     assertEqual
-        (unlines [ "--- Unweighted graph with edges added ---"
-                 , "Vertices: " ++ show (vertices cityGraphWithEdges)
-                 , "Edges: " ++ show (edges cityGraphWithEdges)
-                 ])
+        (show (vertices cityGraphWithEdges))
         ((length (vertices cityGraphWithEdges) == 15) && (sum (map length (edges cityGraphWithEdges)) == 52))
         True
+    assertEqual
+        ("Path from Boston to Miami: ")
+        (case bfs "Boston" (\v -> v == "Miami") (neighbors_of cityGraphWithEdges) of
+            Just node -> "Path from Boston to Miami: " ++ show (nodeToPath node)
+            Nothing -> "No path found from Boston to Miami")
+        "Path from Boston to Miami: [\"Boston\",\"Detroit\",\"Washington\",\"Miami\"]"
     )
 
 testWeightedGraphWithEdges = TestCase( do

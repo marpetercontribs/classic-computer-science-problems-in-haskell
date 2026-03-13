@@ -11,6 +11,7 @@ import Graph (
     , add_edge_by_vertices
     , add_edge_by_vertices'
     )
+import GenericSearch (bfs, nodeToPath)
 
 main :: IO ()
 main = do
@@ -44,10 +45,11 @@ main = do
             ("Boston", "New York"),
             ("New York", "Philadelphia"),
             ("Philadelphia", "Washington")]
-    putStrLn "Unweighted city graph with edges added:"
-    putStrLn $ "Vertices: " ++ show (vertices cityGraphWithEdge)
-    putStrLn $ "Edges: " ++ show (edges cityGraphWithEdge)
-    putStrLn "-----"
+    let result = bfs "Boston" (\v -> v == "Miami") (neighbors_of cityGraphWithEdge)
+    putStrLn $ "Result: " ++ case result of
+            Just node -> "Path from Boston to Miami: " ++ show (nodeToPath node)
+            Nothing -> "No path found from Boston to Miami"
+
     let cityGraphWeighted = makeGraph ["Seattle", "San Francisco", "Los Angeles",
             "Riverside", "Phoenix", "Chicago", "Boston", "New York", "Atlanta",
             "Miami", "Dallas", "Houston", "Detroit", "Philadelphia", "Washington"] :: WeightedGraph String
@@ -78,6 +80,5 @@ main = do
             ("Boston", "New York", 190),
             ("New York", "Philadelphia", 81),
             ("Philadelphia", "Washington", 123)]
-    putStrLn "Weighted city graph with edges added:"
-    putStrLn $ "Vertices: " ++ show (vertices cityGraphWeightedWithEdges)
-    putStrLn $ "Edges: " ++ show (edges cityGraphWeightedWithEdges)
+    putStrLn $  "Weighted city graph with edges added:" ++ show cityGraphWeightedWithEdges
+
