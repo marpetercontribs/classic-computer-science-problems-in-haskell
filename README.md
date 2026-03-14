@@ -39,9 +39,9 @@ In progress:
 - Chapter 4
   - Graph framework (library)
   - Find the shortest path - run `cabal test` to execute the example as unit test of the graph framework.
+  - Minimize cost / minimum spanning tree - run `cabal run mst`
 
 - Chapter 4
-  - Minimize cost - run `cabal test` to execute the example as unit test of the graph framework.
   - Find shortest path with weighted graph - dijkstra
 
 

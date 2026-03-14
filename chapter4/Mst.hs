@@ -10,6 +10,8 @@ import Graph (
     , WeightedGraph(..)
     , add_edge_by_vertices
     , add_edge_by_vertices'
+    , mst
+    , pathToString
     )
 import GenericSearch (bfs, nodeToPath)
 
@@ -46,4 +48,6 @@ main = do
             ("New York", "Philadelphia", 81),
             ("Philadelphia", "Washington", 123)]
     putStrLn $  "Weighted city graph with edges added:" ++ show cityGraphWeightedWithEdges
+    let minimumSpanningTree = mst cityGraphWeightedWithEdges 0
+    putStrLn $ "Minimum spanning tree: \n" ++ (pathToString cityGraphWeightedWithEdges minimumSpanningTree)
 
