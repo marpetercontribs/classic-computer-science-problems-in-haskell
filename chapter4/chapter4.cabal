@@ -33,3 +33,12 @@ executable mst
     build-depends:    base ^>=4.22.0.0
     hs-source-dirs:   ., lib
     default-language: Haskell2010
+
+executable dijkstra
+    main-is:          Dijkstra.hs
+    other-modules:    Graph, GenericSearch
+    hs-source-dirs:   lib, ../chapter2/lib
+    -- other-extensions:
+    build-depends:    base ^>=4.22.0.0
+    hs-source-dirs:   ., lib
+    default-language: Haskell2010

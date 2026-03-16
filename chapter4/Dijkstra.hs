@@ -1,4 +1,4 @@
-{- Mst.hs (Example using Jarnik algorthim to find "minimum spanning tree")
+{- Dijkstra.hs (Dijkstra algorthim to find shortest paths)
    Adapted From Classic Computer Science Problems in Python/Java Chapter 4
    Copyright 2026 Markus Peter
 
@@ -21,17 +21,14 @@ import Graph (
       Graph(..)
     , WeightedGraph(..)
     , add_edge_by_vertices'
-    , mst
-    , pathToString
     )
-import GenericSearch (bfs, nodeToPath)
 
 main :: IO ()
 main = do
-    let cityGraphWeighted = makeGraph ["Seattle", "San Francisco", "Los Angeles",
+    let cityGraph = makeGraph ["Seattle", "San Francisco", "Los Angeles",
             "Riverside", "Phoenix", "Chicago", "Boston", "New York", "Atlanta",
             "Miami", "Dallas", "Houston", "Detroit", "Philadelphia", "Washington"] :: WeightedGraph String
-    let cityGraphWeightedWithEdges = foldr add_edge_by_vertices' cityGraphWeighted [
+    let cityGraphWithEdges = foldr add_edge_by_vertices' cityGraph [
             ("Seattle", "Chicago", 1737), 
             ("Seattle", "San Francisco", 678),
             ("San Francisco", "Riverside", 386),
@@ -58,7 +55,4 @@ main = do
             ("Boston", "New York", 190),
             ("New York", "Philadelphia", 81),
             ("Philadelphia", "Washington", 123)]
-    putStrLn $  "Weighted city graph with edges added:" ++ show cityGraphWeightedWithEdges
-    let minimumSpanningTree = mst cityGraphWeightedWithEdges 0
-    putStrLn $ "Minimum spanning tree: \n" ++ (pathToString cityGraphWeightedWithEdges minimumSpanningTree)
-
+    putStrLn $  "Weighted city graph with edges added:" ++ show cityGraphWithEdges
