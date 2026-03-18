@@ -35,6 +35,7 @@ module Graph (
     , pathToString
 ) where
 
+import PriorityQueue (PriorityQueue(..), queuePush, queuePop, queueSize)
 import Data.List (findIndex)
 
 class Edge a where
@@ -169,15 +170,6 @@ instance (Eq v, Show v) => Show (WeightedGraph v) where
 
 -- minimum spanning tree algorithms like Prim's and Kruskal's
 
--- requires a priority queue - copied from chapter 2.
-data PriorityQueue a = PriorityQueue [a] deriving (Show)
-queuePush :: (Eq a, Ord a) => PriorityQueue a -> a -> PriorityQueue a
-queuePush (PriorityQueue xs) x = PriorityQueue ([ys | ys <- xs, ys < x] ++ [x] ++ [ys | ys <- xs, ys >= x])
-queuePop:: PriorityQueue a -> (a, PriorityQueue a)
-queuePop (PriorityQueue []) = error "Cannot pop from an empty priority queue"
-queuePop (PriorityQueue (x:xs)) = (x, PriorityQueue xs)
-queueSize :: PriorityQueue a -> Int
-queueSize (PriorityQueue xs) = length xs
 -- visit takes a PriorityQueue, list indicating which vertices have been visited, and the index of a vertex
 -- being visited, and returns the "updated" (new) PriorityQueue and list list indicating which vertices have been visited
 visit :: (Eq v) => WeightedGraph v -> PriorityQueue SimpleWeightedEdge -> [Bool] -> Int -> (PriorityQueue SimpleWeightedEdge, [Bool])
