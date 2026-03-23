@@ -29,7 +29,7 @@ import CSP (
 
 import qualified Data.Map.Strict as Map
 import Data.Containers.ListUtils (nubOrd) -- supposedly faster than Data.List nub, removes duplicates while preserving order
-import System.Random (RandomGen, uniformListR, mkStdGen)
+import System.Random (RandomGen, uniformListR, getStdGen)
 
 type Grid = [[Char]]
 
@@ -64,8 +64,8 @@ generateDomain word (headLine:lines) =
     topRightToBottomLeft = [ [GridLocation (row+letter) (col-letter) | letter <- [0..lengthOfWord] ] 
         | row <- [0.. height-lengthOfWord], col <- [lengthOfWord..width]]
 
-generateGrid :: Int -> Int -> Grid
-generateGrid rows cols = chunksOf cols (fst (randomChars (mkStdGen 1254321345) (rows * cols))) where
+generateGrid :: RandomGen g => g -> Int -> Int -> Grid
+generateGrid rg rows cols = chunksOf cols (fst (randomChars rg (rows * cols))) where
     chunksOf _ [] = []
     chunksOf n xs = take n xs : chunksOf n (drop n xs)
     randomChars :: RandomGen g => g -> Int -> ( [Char], g) -- pass new generator back to avoid repeating the same random sequence
@@ -81,7 +81,8 @@ applySolutionToGrid solution grid = foldr applyWordToGrid grid (Map.assocs solut
 
 main :: IO ()
 main = do
-    let grid = generateGrid 10 10
+    rg <- getStdGen
+    let grid = generateGrid rg 10 10
     let words = ["MATHEW", "JOE", "MARY", "SARAH", "SALLY"]
     let locations = Map.fromList [ (word, generateDomain word grid) | word <- words ]
     let csp' = makeCSP locations

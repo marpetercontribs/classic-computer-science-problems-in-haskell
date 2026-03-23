@@ -20,14 +20,14 @@ module Main where
 import Data.Bits (xor)
 import Data.Char (ord, chr)
 import Data.Word (Word8)
-import System.Random (randoms, mkStdGen)
+import System.Random (RandomGen, randoms, getStdGen)
 
-randomKey :: Int -> [Word8]
-randomKey length = take length (randoms (mkStdGen 12345)) -- 12345 is the seed
+randomKey :: RandomGen g => Int -> g -> [Word8]
+randomKey length rg = take length (randoms rg)
 
-encrypt :: String -> ([Word8], [Word8])
-encrypt string = (encrypted, key) where
-   key = randomKey (length string)
+encrypt :: RandomGen g => String -> g -> ([Word8], [Word8])
+encrypt string rg = (encrypted, key) where
+   key = randomKey (length string) rg
    encrypted = zipWith xor key (map (fromIntegral . ord) string)
 -- or a bit more explicit:
 {- encrypt string = (encrypted, key) where
@@ -49,6 +49,7 @@ decrypt key1 key2 = map (chr . fromIntegral) (zipWith xor key1 key2)
 
 main :: IO ()
 main = do
-    let (key1, key2) = encrypt "One Time Pad!"
+    rg <- getStdGen
+    let (key1, key2) = encrypt "One Time Pad!" rg
     let result = decrypt key1 key2
     putStrLn ("Decrypted: " ++ result)
