@@ -28,17 +28,13 @@ test-suite test-graph
 executable mst
     main-is:          Mst.hs
     other-modules:    Graph, PriorityQueue, GenericSearch
-    hs-source-dirs:   lib, ../chapter2/lib
-    -- other-extensions:
     build-depends:    base ^>=4.22.0.0
-    hs-source-dirs:   ., lib
+    hs-source-dirs:   ., lib, ../chapter2/lib
     default-language: Haskell2010
 
 executable dijkstra
     main-is:          Dijkstra.hs
     other-modules:    Graph, PriorityQueue
-    hs-source-dirs:   lib, ../chapter2/lib
-    -- other-extensions:
     build-depends:    base ^>=4.22.0.0, containers
-    hs-source-dirs:   ., lib
+    hs-source-dirs:   ., lib, ../chapter2/lib
     default-language: Haskell2010

@@ -38,10 +38,19 @@ Done:
   - Find the shortest path - run `cabal test` to execute the example as unit test of the graph framework.
   - Minimize cost / minimum spanning tree - run `cabal run mst`
   - Find shortest path with weighted graph - dijkstra
+- Chapter 5
+  - General genetic algorithm
+  - SimpleEquation as simple test
 
 In progress:
 
 - Chapter 5
+
+Todo:
+
+- Chapter 5
+  - SEND + MORE = MONEY example - sendMoreMoney
+  - ListCompression
 
 
 
