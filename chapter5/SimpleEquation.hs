@@ -15,8 +15,6 @@
    limitations under the License.
 -}
 
-{-# LANGUAGE ScopedTypeVariables #-}
-
 module Main (main) where
 
 import GeneticAlgorithm
@@ -27,8 +25,8 @@ instance Chromosome SimpleEquation where
     fitness se = fromIntegral(6 * xx - xx * xx + 4* yy - yy * yy) where
         xx = x se
         yy = y se         
-    crossover this that = ( SimpleEquation { x = x this, y = y that },
-                            SimpleEquation { x = x that, y = y this} )
+    crossover rg this that = ( SimpleEquation { x = x this, y = y that },
+                               SimpleEquation { x = x that, y = y this}, rg )
     randomInstance rg = (SimpleEquation { x = x, y = y }, rg'') where
             (x, rg') = randomR (0,100) rg
             (y, rg'') = randomR (0,100) rg'
@@ -48,9 +46,9 @@ instance Show SimpleEquation where
 main :: IO ()
 main = do
     rg <- getStdGen
-    let (randomSEs :: [SimpleEquation], rg') = foldl 
+    let (randomSEs, rg') = foldl 
             (\(rses, rg') _ -> let (rse,rg'') = randomInstance rg' in (rse:rses,rg'')) 
             ([],rg) [1..20]
-    putStrLn $ show randomSEs
+    putStrLn $ show (randomSEs :: [SimpleEquation])
     let ga = newGeneticAlgorithm randomSEs 0.1 0.7 Tournament
     putStrLn $ show (runGeneticAlgorithm ga rg' 100 13.0)

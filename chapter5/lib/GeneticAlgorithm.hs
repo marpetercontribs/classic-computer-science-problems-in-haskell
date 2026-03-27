@@ -26,11 +26,12 @@ module GeneticAlgorithm(
 
 import System.Random(RandomGen, getStdGen, random, randomR)
 import Data.List(sortBy)
+import Data.Maybe(fromJust, listToMaybe)
 import Debug.Trace(trace)
 
 class Chromosome t where
     fitness :: t -> Float
-    crossover :: t -> t -> (t,t)
+    crossover ::  RandomGen g => g -> t -> t -> (t,t,g)
     -- randomInstance and mutate return a random generator in addition that can be used for follow-on calls
     randomInstance :: RandomGen g => g -> (t,g)
     mutate :: RandomGen g => t -> g -> (t,g)
@@ -55,7 +56,8 @@ newGeneticAlgorithm initialPopulation mutationChance crossOverChance selectionTy
 runGeneticAlgorithm :: (Chromosome c, RandomGen g) => GeneticAlgorithm c -> g -> Int -> Float -> c
 runGeneticAlgorithm ga rg maxGenerations threshold = fst $
     foldl nextGeneration (bestOfPopulation ga, (ga, rg)) [1..maxGenerations] where
-        bestOfPopulation gg = head (sortBy (\a b -> compare (fitness b) (fitness a)) (population gg)) 
+        -- `fromJust . listToMaybe ` instead of simply `head` is used below to avoid compiler warnings about head throwing errors on empty lists
+        bestOfPopulation gg = (fromJust  . listToMaybe) (sortBy (\a b -> compare (fitness b) (fitness a)) (population gg)) 
         nextGeneration (best, (ga, rg)) gen =
             if (fitness best) >= threshold
             then (best, (ga, rg)) -- early exit if we beat threshold
@@ -92,10 +94,11 @@ reproduceAndReplace (ga, rg) = (
         (nextPopulation, rg') = foldl
             (\(pop,rg') _ ->
                 let (parent1, parent2, rg'') = pickParents (ga,rg')
-                    (rndm, rg''') = random rg'' in
-                if rndm < (crossOverChance ga) 
-                then let (parent1',parent2') = crossover parent1 parent2 in ((parent1':parent2':pop), rg''')
-                else ((parent1:parent2:pop), rg'''))
+                    (rndm, rg''') = random rg''
+                in  if rndm < (crossOverChance ga) 
+                    then let (parent1',parent2',rg'''') = crossover rg''' parent1 parent2
+                         in ((parent1':parent2':pop), rg'''')
+                    else ((parent1:parent2:pop), rg'''))
             ([], rg)
             [1..length (population ga) `div` 2]
 
@@ -104,7 +107,8 @@ totalFitness ga = sum (map fitness (population ga))
 
 pickParents :: (Chromosome c, RandomGen g) => (GeneticAlgorithm c, g) -> (c,c,g)
 pickParents (ga, rg)= case (selectionType ga) of
-    Roulette -> undefined
+    Roulette -> let sortedPopulation = sortBy (\a b -> compare (fitness a) (fitness b)) (population ga)
+        in pickRoulette sortedPopulation (map (\c -> (fitness c) / (totalFitness ga)) sortedPopulation) rg
     Tournament -> pickTournament (population ga) (length (population ga) `div` 2) rg
 
 pickTournament :: (Chromosome c, RandomGen g) => [c] -> Int -> g -> (c,c,g)
@@ -113,6 +117,15 @@ pickTournament cs numPlayers rg =
         (pick1:pick2:_) = sortBy (\a b -> compare (fitness b) (fitness a)) (take numPlayers shuffledCs)
     in (pick1, pick2, rg')
     
+pickRoulette :: (Chromosome c, RandomGen g) => [c] -> [Float] -> g -> (c,c,g)
+pickRoulette cs wheel rg =
+    let (pick1,rg') = pickSingle rg
+        (pick2,rg'') = pickSingle rg'
+        pickSingle rg = 
+            let (pick,rg') = random rg
+                loop pick' i (v:vs) = if pick' <= v then cs !! i else loop (pick'-v) (i+1) vs
+            in (loop pick 0 wheel, rg')
+    in (pick1, pick2, rg'')
 
 -- adapted from https://www.literateprograms.org/fisher-yates_shuffle__haskell_.html
 -- probably not very efficient

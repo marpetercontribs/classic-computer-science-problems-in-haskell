@@ -41,15 +41,15 @@ Done:
 - Chapter 5
   - General genetic algorithm
   - SimpleEquation as simple test
+  - SEND + MORE = MONEY example - sendMoreMoney
 
 In progress:
 
 - Chapter 5
-
+  
 Todo:
 
 - Chapter 5
-  - SEND + MORE = MONEY example - sendMoreMoney
   - ListCompression
 
 
