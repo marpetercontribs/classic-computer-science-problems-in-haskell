@@ -64,9 +64,9 @@ runGeneticAlgorithm ga rg maxGenerations threshold = fst $
             else 
                 trace ("Generation " ++ (show gen) ++
                        " Best " ++ (show (fitness best)) ++
-                       " Avg " ++ (show ((totalFitness ga) / (fromIntegral (length (population ga)))))) $
+                       " Avg " ++ (show ((totalFitness ga) / ((fromIntegral . length) (population ga))))) $
                 if (fitness best') > (fitness best) then (best', (ga', rg')) else (best, (ga', rg')) where
-                (ga', rg') = mutateGA (reproduceAndReplace (ga, rg))
+                (ga', rg') = (mutateGA . reproduceAndReplace) (ga, rg)
                 best' = bestOfPopulation ga' 
 
 mutateGA :: (Chromosome c, RandomGen g) => (GeneticAlgorithm c, g) -> (GeneticAlgorithm c, g)

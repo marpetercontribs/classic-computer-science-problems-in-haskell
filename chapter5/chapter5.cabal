@@ -30,3 +30,10 @@ executable sendMoreMoney
     build-depends:    base ^>=4.22.0.0, random >=1.2.0
     hs-source-dirs:   ., lib
     default-language: Haskell2010
+
+executable listCompression
+    main-is:          ListCompression.hs
+    other-modules:    GeneticAlgorithm
+    build-depends:    base ^>=4.22.0.0, random >=1.2.0, zlib, bytestring, string-conversions
+    hs-source-dirs:   ., lib
+    default-language: Haskell2010

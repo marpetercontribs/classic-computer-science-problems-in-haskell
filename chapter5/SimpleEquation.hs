@@ -18,7 +18,7 @@
 module Main (main) where
 
 import GeneticAlgorithm
-import System.Random(RandomGen, random, randomR, getStdGen)
+import System.Random(random, randomR, getStdGen)
 
 data SimpleEquation = SimpleEquation { x :: Int, y :: Int }
 instance Chromosome SimpleEquation where

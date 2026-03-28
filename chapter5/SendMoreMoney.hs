@@ -18,7 +18,7 @@
 module Main (main) where
 
 import GeneticAlgorithm
-import System.Random(RandomGen, random, randomR, getStdGen)
+import System.Random(randomR, getStdGen)
 import Data.List (findIndex)
 import Data.Maybe (fromJust)
 
