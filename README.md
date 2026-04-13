@@ -43,12 +43,28 @@ Done:
   - SimpleEquation as simple test
   - SEND + MORE = MONEY example - sendMoreMoney
   - ListCompression
+- Chapter 6
+  - General KMeans algorithm (library)
+  - Governors example
+  - (Michael Jackson) Albums example
 
 In progress:
 
 Todo:
 
-- Chapter 6
+- Chapter 7
+  - Simple neural networks framework (library)
+  - Classification example: classical Iris data
+  - Classification exmample: Wine data
+- Chapter 8
+  - Adverarial search for board games (library)
+  - TicTacToe example
+  - ConnectFour example
+- Chapter 9
+  - Knapsack problem
+  - Traveling salesman
+  - Phone number mnemonics
+
 
 
 
