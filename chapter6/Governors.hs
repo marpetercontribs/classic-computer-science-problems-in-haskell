@@ -95,4 +95,3 @@ main = do
     mapM_ (\(cluster, idx) -> do
         putStrLn $ "Cluster " ++ show idx ++ ":"
         mapM_ (putStrLn . ("  " ++) . show . original) (dataPoints cluster)) (zip clusters [0..])
-    putStrLn "Done"

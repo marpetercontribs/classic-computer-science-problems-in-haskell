@@ -42,6 +42,7 @@ data (Clusterable p) => DataPoint p = DataPoint {
     , numDimensions :: Int
 }
 
+-- Double must be "Clusterable" so that it can be used as the type for the cluster centroids
 instance Clusterable [Double] where
     fromClusterable x = DataPoint {
           original = x
@@ -60,7 +61,8 @@ data (Clusterable p) => KMeans p = KMeans {
     }
 
 distance :: (Clusterable p, Clusterable q) => DataPoint p -> DataPoint q -> Double
-distance this that = sqrt . sum $ zipWith (\x y -> (x - y) ^ 2) (coordinates this) (coordinates that)
+distance a b = sqrt . sum $
+    zipWith (\x y -> (x - y) ^ 2) (coordinates a) (coordinates b)
 
 newKMeans :: (Clusterable p, RandomGen g) => Int -> [p] -> g -> KMeans p
 newKMeans k ps rg = let dps = zScoreNormalize ps in
@@ -68,17 +70,18 @@ newKMeans k ps rg = let dps = zScoreNormalize ps in
           points = dps
         , clusters = fst $ foldl (\(cs,rg') _ ->
             let (c,rg'') = randomPoint dps rg'
-            in (Cluster { dataPoints = [], centroid = c }:cs, rg'')) ([],rg) [1..k]
+            in (Cluster { dataPoints = [], centroid = c }:cs, rg''))
+                ([],rg) [1..k]
      }
 
 zScoreNormalize :: (Clusterable p) => [p] -> [DataPoint p]
-zScoreNormalize ps = zipWith (\dp zsd -> dp { coordinates = zsd }) dataPoints zScoredDimensions
-    where dataPoints = map fromClusterable ps
-          dimensions = case dataPoints of
+zScoreNormalize ps = zipWith (\dp zsp -> dp { coordinates = zsp }) dps zsps
+    where dps = map fromClusterable ps
+          dimensions = case dps of
                             [] -> 0 -- handle empty list case
                             (dp:_) -> numDimensions dp
-          zScoredDimensions = transpose $
-            map (\dim -> zscores (dimensionSlice dim dataPoints)) [0..dimensions - 1]
+          zsps = transpose $
+            map (\dim -> zscores (dimensionSlice dim dps)) [0..dimensions - 1]
 
 randomPoint :: (Clusterable p, RandomGen g) => [DataPoint p] -> g -> (DataPoint [Double], g)
 randomPoint dps rg = case dps of
@@ -92,19 +95,25 @@ randomPoint dps rg = case dps of
         in (fromClusterable cs, rg''')
 
 runKMeans :: (Clusterable p) => KMeans p -> Int -> [Cluster p]
-runKMeans kmeans maxIterations
-    | maxIterations <= 0 = clusters kmeans
-    | otherwise =   let nextClusters = (generateCentroids . assignClusters) kmeans
-                    in  if coordinatesAreEqual (map centroid nextClusters) (map centroid (clusters kmeans))
-                        -- Ausgabe stimmt noch nicht weil rückwärts gezählt wird!
-                        then trace ("Converged after " ++ (show maxIterations) ++ " iterations") $ clusters kmeans
-                        else runKMeans kmeans { clusters = nextClusters } (maxIterations - 1)
+runKMeans kmeans maxIterations = loop 0 kmeans
+    where loop iteration kmeans
+            | iteration >= maxIterations = clusters kmeans
+            | otherwise =
+                let nextClusters = (generateCentroids . assignClusters) kmeans
+                in  if coordinatesAreEqual (map centroid nextClusters)
+                        (map centroid (clusters kmeans))
+                    then trace ("Converged after " ++ (show iteration) ++ " iterations")
+                        $ clusters kmeans
+                    else loop (iteration + 1) kmeans { clusters = nextClusters }
 
 assignClusters :: (Clusterable p) => KMeans p -> [Cluster p]
 assignClusters kmeans = foldl (\cs dp -> addToClosestCluster dp cs)
-    (map (\c-> c { dataPoints = [] }) (clusters kmeans)) -- the clusters should be cleared before points are assigned
+    -- the clusters must be cleared before points are assigned
+    (map (\c-> c { dataPoints = [] }) (clusters kmeans))
     (points kmeans)
 
+-- helper "function" to get the maximum double value as a starting point for finding the closest cluster
+-- because Haskell has no built-in constant for the maximum double value
 maxDouble :: Double
 maxDouble = x
   where n = floatDigits x
@@ -124,7 +133,8 @@ closestCluster dp clusters = case clusters of
 
 addToClosestCluster :: (Clusterable p) => DataPoint p -> [Cluster p] -> [Cluster p]
 addToClosestCluster dp clusters = let closestIdx = closestCluster dp clusters
-    in map (\(c,idx) -> if idx == closestIdx then c { dataPoints = dp : dataPoints c } else c)
+    in map (\(c,idx) ->
+        if idx == closestIdx then c { dataPoints = dp : dataPoints c } else c)
         (zip clusters [0..])
 -- alternative implementation using take, ++ and drop:    
         -- take closestIdx clusters ++
@@ -142,11 +152,12 @@ generateCentroids clusters = map (\cluster -> case dataPoints cluster of
     clusters
 
 coordinatesAreEqual :: [DataPoint [Double]] -> [DataPoint [Double]] -> Bool
-coordinatesAreEqual dps1 dps2 = all (\(dp1, dp2) -> coordinates dp1 == coordinates dp2)
+coordinatesAreEqual dps1 dps2 = all
+    (\(dp1, dp2) -> coordinates dp1 == coordinates dp2)
     (zip dps1 dps2)
 
 dimensionSlice :: (Clusterable p) => Int -> [DataPoint p] -> [Double]
-dimensionSlice dim dataPoints = map (\dp -> coordinates dp !! dim) dataPoints
+dimensionSlice dim dps = map (\dp -> coordinates dp !! dim) dps
 
 zscores :: [Double] -> [Double]
 zscores xs = let m = mean xs
