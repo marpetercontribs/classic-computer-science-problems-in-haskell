@@ -50,11 +50,13 @@ Done:
 
 In progress:
 
-Todo:
-
 - Chapter 7
   - Simple neural networks framework (library)
   - Classification example: classical Iris data
+
+Todo:
+
+- Chapter 7
   - Classification exmample: Wine data
 - Chapter 8
   - Adverarial search for board games (library)
