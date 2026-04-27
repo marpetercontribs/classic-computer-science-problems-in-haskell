@@ -26,8 +26,6 @@ import qualified Layer as Layer
 import qualified Neuron as Neuron
 import System.Random(RandomGen)
 
-import Debug.Trace(trace)
-
 data Network = Network { layers :: [Layer.Layer] }
 
 new :: RandomGen rg => rg -> [Int] -> Double -> 
@@ -44,7 +42,8 @@ new rg layerStructure learningRate activationFn activationFn'
                ([inputLayer], rg') sizes'
           in (Network { layers = reverse ls }, rg'')
           
--- Returns the output of the network for a given input, and the new network with updated caches
+-- Returns the output of the network for a given input
+-- and the new network with updated caches, to remain pure
 outputs :: Network -> [Double] -> (Network, [Double])
 outputs network inputs = ( Network { layers = reverse updatedLayers }, outputs )
   where
@@ -59,21 +58,23 @@ fst3 (x, _, _) = x
  -- returns the list of deltas for each layer only, does not "update" the network / its layers / neurons!
 backpropagate :: Network -> [Double] -> [[Double]]
 backpropagate network expected = fst3 $ foldl
-   (\(ds,nl,nlds) layer -> let lds = Layer.deltasForHiddenLayer layer nl nlds 
+   (\(ds,nl,nlds) layer -> let lds = Layer.deltasForHiddenLayer layer nl nlds
                             in (lds:ds,layer,lds))
    ([outputLayerDeltas],outputLayer,outputLayerDeltas) restLayers
    where (outputLayer:restLayers) = reverse (drop 1 (layers network)) -- ignore input layer, start with output layer and work backwards
          outputLayerDeltas = Layer.deltasForOutputLayer outputLayer expected
+
 updateWeights :: Network -> [[Double]] -> Network
 updateWeights network deltas = Network { layers = fst $
-   foldl (\(ls',prev) (layer, delta) -> (ls' ++ [updateLayerWeights layer prev delta],layer))
+   foldl (\(ls',prev) (l, d) -> (ls' ++ [updateLayerWeights l prev d],l))
    ([inputLayer],inputLayer) (zip ls deltas) }
    where (inputLayer:ls) = layers network
-         updateLayerWeights layer prevLayer deltas = layer { Layer.neurons = updatedNeurons }
-            where updatedNeurons = zipWith (updateNeuronWeights prevLayer) (Layer.neurons layer) deltas
-         updateNeuronWeights prevLayer neuron delta = neuron {
-            Neuron.weights = map (\(w, inp) -> w + Neuron.learningRate neuron * delta * inp) (zip (Neuron.weights neuron) prevOutputs) }
-            where prevOutputs = Layer.outputCache prevLayer
+         updateLayerWeights l prev ds = l { Layer.neurons = ns' }
+            where ns' = zipWith (updateNeuronWeights prev) (Layer.neurons l) ds
+         updateNeuronWeights prev n d = n { Neuron.weights = 
+            map (\(w, inp) -> w + Neuron.learningRate n * d * inp)
+            (zip (Neuron.weights n) prevOutputs) }
+            where prevOutputs = Layer.outputCache prev
 
 train :: Network -> [[Double]] ->  [[Double]] -> Network
 train network inputs expected = foldl

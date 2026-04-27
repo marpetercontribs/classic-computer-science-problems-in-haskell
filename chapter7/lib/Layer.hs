@@ -64,10 +64,7 @@ outputs layer inputs = (layer { neurons = updatedNeurons, outputCache = cache },
             Just prevLayer -> unzip $ map (Neuron.output inputs) (neurons layer)
  
 
--- TODO: can the following be omitted / reworked if the NeuralNetwork.backpropagate function is reworked?
--- should only be called on the output layer
--- in contrast to the Python/Java/Rust version, does not update the delta field of the neurons
--- check if this is needed!
+-- in contrast to the Python/Java/Rust version, does not update a delta field of the neurons
 deltasForOutputLayer :: Layer -> [Double] -> [Double]
 deltasForOutputLayer layer expected = 
     zipWith (*)
@@ -75,13 +72,9 @@ deltasForOutputLayer layer expected =
     (map (\n -> (Neuron.activationFunction n) (Neuron.outputCache n)) (neurons layer))
 
 -- should not be called on the output layer
--- in contrast to the Python/Java/Rust version, does not update the delta field of the neurons
--- check if this is needed!
+-- in contrast to the Python/Java/Rust version, does not update a delta field of the neurons
 deltasForHiddenLayer :: Layer -> Layer -> [Double]-> [Double]
 deltasForHiddenLayer layer nextLayer nextLayerDeltas = zipWith
     (\n i -> (activationFunctionDerivative layer) (Neuron.outputCache n)
            * (dotProduct nextLayerDeltas (map (\n' -> Neuron.weights n' !! i) (neurons nextLayer))))
     (neurons layer) [0..]
-    -- where nextLayerDeltas = map Neuron.delta (neurons nextLayer)
-
-

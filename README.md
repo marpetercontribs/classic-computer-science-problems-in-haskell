@@ -47,17 +47,17 @@ Done:
   - General KMeans algorithm (library)
   - Governors example
   - (Michael Jackson) Albums example
-
-In progress:
-
 - Chapter 7
   - Simple neural networks framework (library)
   - Classification example: classical Iris data
 
-Todo:
+In progress:
 
 - Chapter 7
   - Classification exmample: Wine data
+
+Todo:
+
 - Chapter 8
   - Adverarial search for board games (library)
   - TicTacToe example

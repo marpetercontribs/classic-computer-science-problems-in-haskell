@@ -23,6 +23,12 @@ module Neuron(
 
 import Utils(dotProduct)
 
+{- Note: this implementation
+         - does not use a "delta" field in the Neurons - the deltas are
+           passed from layer to layer during backpropagation and returned there as list of lists,
+           then passed, within the Layer's train function, to the updateWeights function
+         - does not store the activationFunctionDerivative in the Neuron, but in the Layer instead
+-}
 data Neuron = Neuron {
      weights :: [Double]
    , learningRate :: Double
@@ -38,6 +44,9 @@ new weights learningRate activationFunction =
            , activationFunction = activationFunction
            }
 
+-- calculate the output of a neuron for a given input
+-- and return the new neuron with updated output cache and the output value
+-- to remain "pure"
 output :: [Double] -> Neuron -> (Neuron, Double)
 output inputs neuron = (neuron { outputCache = cache }, activationFunction neuron cache)
     where cache = dotProduct (weights neuron) inputs
