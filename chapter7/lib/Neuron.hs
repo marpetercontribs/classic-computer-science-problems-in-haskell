@@ -18,6 +18,7 @@
 module Neuron(
        Neuron(..)
      , new
+     , updateCache
      , output
 ) where
 
@@ -44,9 +45,13 @@ new weights learningRate activationFunction =
            , activationFunction = activationFunction
            }
 
--- calculate the output of a neuron for a given input
--- and return the new neuron with updated output cache and the output value
--- to remain "pure"
-output :: [Double] -> Neuron -> (Neuron, Double)
-output inputs neuron = (neuron { outputCache = cache }, activationFunction neuron cache)
-    where cache = dotProduct (weights neuron) inputs
+-- calculate the 'outputCache' of a neuron for a given input
+-- and return the new neuron with updated outputCache, to remain pure
+updateCache :: [Double] -> Neuron -> Neuron
+updateCache inputs neuron =
+    neuron { outputCache = dotProduct (weights neuron) inputs }
+
+-- return the true output of the neuron for a given input,
+-- assuming the neuron's outputCache is already updated for the given input)
+output :: [Double] -> Neuron -> Double
+output inputs neuron = activationFunction neuron (outputCache neuron)

@@ -55,13 +55,18 @@ new (Just prevLayer, rg) numOfNeurons learningRate activationFn activationFn' =
             [1..numOfNeurons]
 
 randomWeights :: RandomGen rg => rg -> Int -> ([Double], rg)
-randomWeights rg n = foldl (\(ws, rg') _ -> let (w, rg'') = random rg' in (w:ws, rg'')) ([], rg) [1..n]
+randomWeights rg n = foldl
+    (\(ws, rg') _ -> let (w, rg'') = random rg' in (w:ws, rg''))
+    ([], rg) [1..n]
 
 outputs :: Layer -> [Double] -> (Layer, [Double])
-outputs layer inputs = (layer { neurons = updatedNeurons, outputCache = cache }, cache)
-    where (updatedNeurons, cache) = case previousLayer layer of
-            Nothing -> (neurons layer, inputs)
-            Just prevLayer -> unzip $ map (Neuron.output inputs) (neurons layer)
+outputs layer inputs = (layer { neurons = neurons', outputCache = cache }, cache)
+    where neurons' = case previousLayer layer of
+            Nothing -> neurons layer
+            Just prevLayer -> map (Neuron.updateCache inputs) (neurons layer) 
+          cache = case previousLayer layer of
+            Nothing -> inputs
+            Just prevLayer -> map (Neuron.output inputs) neurons'
  
 
 -- in contrast to the Python/Java/Rust version, does not update a delta field of the neurons
