@@ -7,7 +7,7 @@ homepage:           https://github.com/marpetercontribs/classic-computer-science
 license:            Apache-2.0
 license-file:       ../LICENSE
 author:             Markus Peter
-maintainer:         marpeterweb.de
+maintainer:         marpeter@web.de
 copyright:          (c) 2026 by Markus Peter
 build-type:         Simple
 
@@ -27,6 +27,13 @@ test-suite test-genericSearch
 
 executable iris
     main-is:          Iris.hs
+    other-modules:    NeuralNetwork, Layer, Neuron, Utils
+    build-depends:    base ^>=4.22.0.0, random >=1.2.0
+    hs-source-dirs:   ., lib
+    default-language: Haskell2010
+
+executable wine
+    main-is:          Wine.hs
     other-modules:    NeuralNetwork, Layer, Neuron, Utils
     build-depends:    base ^>=4.22.0.0, random >=1.2.0
     hs-source-dirs:   ., lib

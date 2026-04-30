@@ -50,11 +50,10 @@ Done:
 - Chapter 7
   - Simple neural networks framework (library)
   - Classification example: classical Iris data
+  - Classification exmample: Wine data
 
 In progress:
 
-- Chapter 7
-  - Classification exmample: Wine data
 
 Todo:
 

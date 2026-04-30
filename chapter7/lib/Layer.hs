@@ -38,7 +38,7 @@ new :: RandomGen rg => (Maybe Layer, rg) -> Int -> Double ->
     (Double -> Double) -> (Double -> Double) -> (Layer, rg)
 new (Nothing, rg) numOfNeurons learningRate activationFn activationFn' =
     (Layer { previousLayer = Nothing
-            , neurons = [Neuron.new [] learningRate activationFn {- activationFn' -} | _ <- [1..numOfNeurons]]
+            , neurons = [Neuron.new [] learningRate activationFn | _ <- [1..numOfNeurons]]
             , activationFunctionDerivative = activationFn'
             , outputCache = replicate numOfNeurons 0.0
             }, rg)
@@ -50,7 +50,7 @@ new (Just prevLayer, rg) numOfNeurons learningRate activationFn activationFn' =
             }, rg')
     where (neurns, rg') = foldl
             (\(ns, rg'') _ -> let (weights,rg''') = randomWeights rg'' (length (neurons prevLayer))
-                in ((Neuron.new weights learningRate activationFn {- activationFn' -}):ns,rg'''))
+                in ((Neuron.new weights learningRate activationFn):ns,rg'''))
             ([],rg)
             [1..numOfNeurons]
 
