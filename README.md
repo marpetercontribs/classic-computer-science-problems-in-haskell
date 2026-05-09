@@ -54,12 +54,13 @@ Done:
 
 In progress:
 
+- Chapter 8
+  - Adverarial search for board games (library)
+  - TicTacToe example
 
 Todo:
 
 - Chapter 8
-  - Adverarial search for board games (library)
-  - TicTacToe example
   - ConnectFour example
 - Chapter 9
   - Knapsack problem
