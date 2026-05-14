@@ -45,7 +45,7 @@ getMove board = do
                 putStrLn "Invalid move, try again."
                 getMove board
       else do
-         let move = findBestMove board 6
+         let move = findBestMove board 7
          putStrLn $ "AI plays column " ++ show move
          return move
 

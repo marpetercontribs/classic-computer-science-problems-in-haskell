@@ -54,11 +54,9 @@ Done:
 - Chapter 8
   - Adverarial search for board games (library)
   - TicTacToe example
+  - ConnectFour example
 
 In progress:
-
-- Chapter 8
-  - ConnectFour example
 
 Todo:
 

@@ -34,9 +34,39 @@ minimax board isMaximizing player maxDepth
     | otherwise    = minimum (map (\b -> minimax b True player (maxDepth - 1))
                         (map (move board) (legalMoves board)))
 
+alphabeta :: (Show b, Board b p m) => b -> Bool -> p -> Int -> Double
+alphabeta = innerAlphabeta (-1/0) (1/0) -- -infinity and infinity
+  where
+    innerAlphabeta al be board isMaximizing player maxDepth
+      | isWin board || isDraw board || maxDepth == 0 = evaluate board player
+      | isMaximizing && be <= al = al
+      | isMaximizing = foldl
+            (\al' b -> let al'' = innerAlphabeta al' be b False player (maxDepth - 1)
+                        in if al'' >= be then al'' else max al' al'')
+            al (map (move board) (legalMoves board))
+{-    -- "straitforward" implementation would not cut off maximum determination
+      -- early, but always evaluate all moves, which is inefficient
+         let newAl = maximum
+               (al : map (\b -> innerAlphabeta al be b False player (maxDepth - 1))
+               (map (move board) (legalMoves board)))
+         in if newAl >= be then newAl
+            else innerAlphabeta newAl be board True player (maxDepth - 1) -}
+      | not isMaximizing && al >= be = be
+      | otherwise  = foldl
+            (\be' b -> let be'' = innerAlphabeta al be' b True player (maxDepth - 1)
+                        in if be'' <= al then be'' else min be' be'')
+            be (map (move board) (legalMoves board))
+{-    -- "straitforward" implementation would not cut off minimum determination
+      -- early, but always evaluate all moves, which is inefficient      
+         let newBe = minimum
+               (be : map (\b -> innerAlphabeta al be b True player (maxDepth - 1))
+               (map (move board) (legalMoves board)))
+        in if newBe <= al then newBe
+         else innerAlphabeta al newBe board False player (maxDepth - 1) -}
+
 findBestMove :: (Show b, Board b p m) => b -> Int -> m
 findBestMove board maxDepth = fst $ maximumBy
       (\(_, score1) (_, score2) -> compare score1 score2) -- compare the scores of the moves
       -- for each legal move, get the tuple of the move and its minimax score
-      (map (\m -> (m, minimax (move board m) False (turn board) maxDepth))
+      (map (\m -> (m, alphabeta (move board m) False (turn board) maxDepth))
          (legalMoves board))

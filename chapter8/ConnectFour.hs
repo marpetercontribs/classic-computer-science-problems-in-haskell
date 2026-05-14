@@ -101,11 +101,12 @@ countSegment b segment = foldl (\(yc,rc) (col,row) ->
     ) (0,0) segment
 
 evaluateSegment :: Board -> Segment -> Piece -> Double
-evaluateSegment b s p =
-    if yc > 0 && rc > 0 then 0 -- mixed segments are neutral
-    else if winner == p then score else -score
+evaluateSegment b s p
+    | yc>0 && rc>0 = 0 -- mixed segments are neutral
+    | winner == p = score -- only player's pieces
+    | otherwise = -score -- only opponent's pieces
     where (yc,rc) = countSegment b s
-          score = (case maximum [yc,rc] of
+          score = (case max yc rc of
                 2 -> 1
                 3 -> 100
                 4 -> 1000000
