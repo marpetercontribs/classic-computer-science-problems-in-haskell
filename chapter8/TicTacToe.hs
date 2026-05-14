@@ -17,7 +17,10 @@
 
 {-# LANGUAGE FunctionalDependencies #-}
 
-module TicTacToe (TTTBoard(..), TTTPiece(..), newBoard) where
+module TicTacToe (
+      TTTBoard
+    , TTTPiece(..)
+    , newBoard) where
 
 import qualified Board
 import MiniMax
@@ -42,17 +45,18 @@ instance Board.Board TTTBoard TTTPiece Int where
     move b m = b {
         board = take m (board b) ++ [turn b] ++ drop (m + 1) (board b),
         turn = Board.opposite (turn b) }
-    isWin b = any (\[i, j, k] -> board b !! i == board b !! j && board b !! j == board b !! k && board b !! i /= E) 
-        [[0,1,2], [3,4,5], [6,7,8], [0,3,6], [1,4,7], [2,5,8], [0,4,8], [2,4,6]]
-    evaluate b p = if Board.isWin b then if turn b == p then -1 else 1 else 0
+    isWin b = any (\(i, j, k) -> board b !! i == board b !! j
+            && board b !! j == board b !! k && board b !! i /= E) 
+        [(0,1,2), (3,4,5), (6,7,8), (0,3,6), (1,4,7),
+         (2,5,8), (0,4,8), (2,4,6)]
+    evaluate b p = if Board.isWin b
+        then if turn b == p then -1 else 1
+        else 0
 
 instance Show TTTBoard where
-    show b = unlines [ (show (board b !! 0) ++ " | " ++ show (board b !! 1) ++ " | " ++ show (board b !! 2)),
-                       "--+---+--",
-                       (show (board b !! 3) ++ " | " ++ show (board b !! 4) ++ " | " ++ show (board b !! 5)),
-                       "--+---+--",
-                       (show (board b !! 6) ++ " | " ++ show (board b !! 7) ++ " | " ++ show (board b !! 8)) ]
-
-main = do
-    let board = Board.move TTTBoard { board = [X, E, E, E, E, O, O, X, E], turn = X } 1
-    putStrLn $ show board
+    show b = unlines [
+        (show (board b!!0) ++ " | " ++ show (board b!!1) ++ " | " ++ show (board b!!2)),
+        "--+---+--",
+        (show (board b!!3) ++ " | " ++ show (board b!!4) ++ " | " ++ show (board b!!5)),
+        "--+---+--",
+        (show (board b!!6) ++ " | " ++ show (board b!!7) ++ " | " ++ show (board b!!8)) ]

@@ -51,17 +51,17 @@ Done:
   - Simple neural networks framework (library)
   - Classification example: classical Iris data
   - Classification exmample: Wine data
-
-In progress:
-
 - Chapter 8
   - Adverarial search for board games (library)
   - TicTacToe example
 
-Todo:
+In progress:
 
 - Chapter 8
   - ConnectFour example
+
+Todo:
+
 - Chapter 9
   - Knapsack problem
   - Traveling salesman

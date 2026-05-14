@@ -1,4 +1,4 @@
-{- TicTacToeAI.hs
+{- ConnectFourAI.hs
    Adapted From Classic Computer Science Problems in Python/Java Chapter 8
    Copyright 2026 Markus Peter
 
@@ -17,40 +17,40 @@
 
 module Main where
 
-import TicTacToe (TTTBoard, TTTPiece(..), newBoard)
-import Board (Board(..))
+import ConnectFour(Board, Piece(..), newBoard)
+import Board
 import MiniMax (findBestMove)
 import System.IO (hFlush, stdout)
 
-getMove :: TTTBoard -> IO Int
-getMove board = do
-    if Board.turn board == X then do
-        putStr "Enter your move (0-8): "
-        hFlush stdout -- Ensure the prompt is printed before waiting for input
-        move <- getLine
-        let moveInt = read move :: Int
-        if moveInt `elem` legalMoves board
-            then return moveInt
-            else do
-               putStrLn "Invalid move, try again."
-               getMove board
-    else do 
-        let aiMove = findBestMove board 8
-        putStrLn $ "AI plays: " ++ show aiMove
-        return aiMove
-
-gameLoop :: TTTBoard -> IO ()
+gameLoop :: ConnectFour.Board -> IO ()
 gameLoop board = do
     move <- getMove board
     let newBoard = Board.move board move
     putStrLn $ show newBoard
     if isWin newBoard then
-        if Board.turn newBoard == O then putStrLn "You win!" else putStrLn "AI wins!"
+        if Board.turn newBoard == R then putStrLn "You win!" else putStrLn "AI wins!"
     else if isDraw newBoard then putStrLn "It's a draw!"
     else gameLoop newBoard
 
+getMove :: ConnectFour.Board -> IO Int
+getMove board = do
+      if Board.turn board == Y then do -- human's turn
+         putStr "Enter your move (0-6): "
+         hFlush stdout -- Ensure the prompt is printed before waiting for input
+         move <- getLine
+         let moveInt = read move :: Int
+         if moveInt `elem` legalMoves board
+               then return moveInt
+               else do
+                putStrLn "Invalid move, try again."
+                getMove board
+      else do
+         let move = findBestMove board 6
+         putStrLn $ "AI plays column " ++ show move
+         return move
+
 main :: IO ()
 main = do
+    putStrLn "Welcome to Connect Four! You are Yellow (Y) and the AI is Red (R)."
     let board = newBoard
-    putStrLn "Welcome to Tic Tac Toe!"
     gameLoop board
