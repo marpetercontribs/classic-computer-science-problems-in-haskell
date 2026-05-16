@@ -31,12 +31,11 @@ instance Show Item where
 
 knapsack :: [Item] -> Int -> [Item]
 knapsack items capacity = fst $ foldl
-    (\(solution,cap) (i,item) -> if table!!i!!cap /= table!!(i+1)!!cap
+    (\(solution,cap) (row, nextRow, item) -> if row!!cap /= nextRow!!cap
                 then (item:solution,cap - weight item)
                 else (solution,cap))
     ([],capacity) -- initial solution is empty and rucksack at full capacity
-     -- the following gives us index and item for each item,
-    (zip [0..length items-1] (reverse items))
+    (zip3 table (drop 1 table) (reverse items))
     where -- this constructs the table row by row to avoid having to create
           -- the initial table with all 0s and then update it,
           -- starting with the initial row for "no items"

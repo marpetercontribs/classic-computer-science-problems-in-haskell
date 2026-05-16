@@ -55,16 +55,17 @@ Done:
   - Adverarial search for board games (library)
   - TicTacToe example
   - ConnectFour example
+- Chapter 9
+  - Knapsack problem
 
 In progress:
 
 - Chapter 9
-  - Knapsack problem
+  - Traveling salesman
 
 Todo:
 
 - Chapter 9
-  - Traveling salesman
   - Phone number mnemonics
 
 
