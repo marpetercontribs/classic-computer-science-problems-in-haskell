@@ -23,7 +23,7 @@ data Item = Item {
       name :: String
     , weight :: Int
     , value :: Double
-    } -- deriving (Show)
+    }
 instance Show Item where
     show item = name item
              ++ " (weight: " ++ show (weight item)
@@ -31,18 +31,26 @@ instance Show Item where
 
 knapsack :: [Item] -> Int -> [Item]
 knapsack items capacity = fst $ foldl
-    (\(sol,cap) i -> if table !! (i-1) !! cap /= table !! i !! cap
-                then (items !! (i-1) : sol,cap - weight (items !! (i-1)))
-                else (sol,cap))
-    ([],capacity) (reverse [1..length items])
-    where table :: [[Double]]
-          table = foldl
-                (\table (i, item) -> table ++ [
-                    foldl (\row cap -> if cap >= weight item
-                         then row ++ [max (table !! i !! cap) (value item + table !! i !! (cap - weight item))]
-                         else row ++ [table !! i !! cap])
-                         [0.0] [1..capacity]])
-                [replicate (capacity + 1) (0::Double)] -- initial row for "no items"
+    (\(solution,cap) (i,item) -> if table !! i !! cap /= table !! (i+1) !! cap
+                then (item: solution,cap - weight item)
+                else (solution,cap))
+    ([],capacity) -- initial solution is empty and rucksack at full capacity
+     -- following gives us index and item for each item,
+     -- reversed for backtracking from the end of the table
+    (reverse (zip [0..length items-1] items))
+    where initialRow = replicate (capacity + 1) (0::Double) -- initial row for "no items"
+          -- this constructs the table row by row to avoid having to create
+          -- the initial table with all 0s and then update it,
+          -- starting with the initial row for "no items"
+          table = fst $ foldl
+                (\(table,lastRow) (i, item) -> 
+                    let newRow = foldl (\row cap -> if cap >= weight item
+                         then row ++ [max (lastRow !! cap)
+                                     (value item + lastRow !! (cap - weight item))]
+                         else row ++ [lastRow !! cap])
+                         [0.0] [1..capacity]
+                    in (table ++ [newRow], newRow))
+                ([initialRow], initialRow) -- 
                 (zip [0..] items) -- zip items with their indices for easy access in the table
 
 main :: IO ()
