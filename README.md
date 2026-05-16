@@ -58,10 +58,12 @@ Done:
 
 In progress:
 
+- Chapter 9
+  - Knapsack problem
+
 Todo:
 
 - Chapter 9
-  - Knapsack problem
   - Traveling salesman
   - Phone number mnemonics
 
