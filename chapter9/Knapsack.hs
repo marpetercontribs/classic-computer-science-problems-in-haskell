@@ -31,27 +31,29 @@ instance Show Item where
 
 knapsack :: [Item] -> Int -> [Item]
 knapsack items capacity = fst $ foldl
-    (\(solution,cap) (i,item) -> if table !! i !! cap /= table !! (i+1) !! cap
-                then (item: solution,cap - weight item)
+    (\(solution,cap) (i,item) -> if table!!i!!cap /= table!!(i+1)!!cap
+                then (item:solution,cap - weight item)
                 else (solution,cap))
     ([],capacity) -- initial solution is empty and rucksack at full capacity
-     -- following gives us index and item for each item,
-     -- reversed for backtracking from the end of the table
-    (reverse (zip [0..length items-1] items))
-    where initialRow = replicate (capacity + 1) (0::Double) -- initial row for "no items"
-          -- this constructs the table row by row to avoid having to create
+     -- the following gives us index and item for each item,
+    (zip [0..length items-1] (reverse items))
+    where -- this constructs the table row by row to avoid having to create
           -- the initial table with all 0s and then update it,
           -- starting with the initial row for "no items"
-          table = fst $ foldl
-                (\(table,lastRow) (i, item) -> 
-                    let newRow = foldl (\row cap -> if cap >= weight item
-                         then row ++ [max (lastRow !! cap)
-                                     (value item + lastRow !! (cap - weight item))]
-                         else row ++ [lastRow !! cap])
-                         [0.0] [1..capacity]
-                    in (table ++ [newRow], newRow))
-                ([initialRow], initialRow) -- 
-                (zip [0..] items) -- zip items with their indices for easy access in the table
+          -- note that the table is built in reverse row order compared to Kopec's book
+          table = foldl
+                (\rows@(lastRow:_) item ->
+                    -- constructs new row
+                    (reverse $ foldl (\row cap -> 
+                         if cap >= weight item
+                         then max (lastRow!!cap)
+                                  (value item + lastRow!!(cap - weight item))
+                              :row
+                         else lastRow!!cap:row)
+                         [0.0] [1..capacity])
+                    :rows)
+                [replicate (capacity + 1) 0.0] -- initial table with one row for "no items"
+                items
 
 main :: IO ()
 main = do
